@@ -17,6 +17,10 @@ dependencies:
 - mtl
 - hspec
 - hspec-contrib
+- text
+- discord-haskell
+- emoji
+- unliftio
 
 ghc-options:
 - -Wall
