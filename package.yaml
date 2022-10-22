@@ -18,7 +18,8 @@ dependencies:
 - hspec-contrib
 - discord-haskell
 - emoji
-- unliftio
+- acid-state
+- safecopy
 
 ghc-options:
 - -Wall

@@ -1,6 +1,6 @@
 module Prelude (module Relude, echo) where
 
-import Relude
+import Relude hiding (id)
 
 -------------------------------------------------------------------------------
 

@@ -25,7 +25,7 @@ ping = slash $ SlashProps
   , permLvl = PermLvlUser
   , options = [ optionString "input" "The text to send back" ]
   , handler =
-      \(iId, iToken) _mem opts ->
+      \(iId, iToken) _mem opts -> do
         case opts of
           Just (OptionsDataValues vals) -> do
             case find ((==) "input" . optionDataValueName) vals of

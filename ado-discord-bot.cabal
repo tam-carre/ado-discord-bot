@@ -34,6 +34,7 @@ library
       DiscordBot.Events.BotStarted
       DiscordBot.Events.DiscordAPI.InteractionCreate
       DiscordBot.Events.DiscordAPI.Ready
+      DiscordBot.Guilds.Settings
       DiscordBot.Perms
       DiscordBot.SendMessage
       DiscordBot.SlashCommand
@@ -44,13 +45,14 @@ library
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
-      base-noprelude
+      acid-state
+    , base-noprelude
     , discord-haskell
     , emoji
     , hspec
     , hspec-contrib
     , relude
-    , unliftio
+    , safecopy
   default-language: Haskell2010
 
 executable ado-discord-bot-exe
@@ -61,14 +63,15 @@ executable ado-discord-bot-exe
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      ado-discord-bot
+      acid-state
+    , ado-discord-bot
     , base-noprelude
     , discord-haskell
     , emoji
     , hspec
     , hspec-contrib
     , relude
-    , unliftio
+    , safecopy
   default-language: Haskell2010
 
 test-suite ado-discord-bot-test
@@ -80,12 +83,13 @@ test-suite ado-discord-bot-test
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      ado-discord-bot
+      acid-state
+    , ado-discord-bot
     , base-noprelude
     , discord-haskell
     , emoji
     , hspec
     , hspec-contrib
     , relude
-    , unliftio
+    , safecopy
   default-language: Haskell2010
