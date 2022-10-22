@@ -2,7 +2,6 @@ module DiscordBot.SendMessage (reply, replyEmbed, embed) where
 
 -- Downloaded libraries
 import Discord   (DiscordHandler, restCall, def)
-import Data.Text (Text)
 
 import qualified Discord.Requests as R
 
@@ -17,9 +16,6 @@ import Discord.Interactions
   , InteractionResponse (InteractionResponseChannelMessage)
   , InteractionResponseMessage (..)
   )
-
--- Base
-import Control.Monad (void)
 
 -------------------------------------------------------------------------------
 

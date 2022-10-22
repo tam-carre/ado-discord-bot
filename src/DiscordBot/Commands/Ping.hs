@@ -5,7 +5,6 @@ module DiscordBot.Commands.Ping (ping) where
 -- Ado Bot modules
 import DiscordBot.Perms       (PermLvl (..))
 import DiscordBot.SendMessage (replyEmbed)
-import DiscordBot.Utils       (putLn)
 
 import DiscordBot.SlashCommand
   ( slash
@@ -16,9 +15,6 @@ import DiscordBot.SlashCommand
 
 -- Downloaded libraries
 import Discord.Interactions (OptionsData (..), OptionDataValue (..))
-
--- Base
-import Data.Foldable (find)
 
 -------------------------------------------------------------------------------
 
@@ -36,9 +32,9 @@ ping = slash $ SlashProps
               Just inputOption ->
                 case optionDataValueString inputOption of
                   Right input -> replyEmbed (iId, iToken) input
-                  Left err -> putLn $ "Misconfigured command: " <> err
+                  Left err -> putTextLn $ "Misconfigured command: " <> err
 
-              _ -> putLn "Misconfigured command"
+              _ -> putTextLn "Misconfigured command"
 
-          _ -> putLn "Misconfigured command"
+          _ -> putTextLn "Misconfigured command"
   }

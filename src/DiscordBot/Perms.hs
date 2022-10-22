@@ -14,9 +14,6 @@ import Discord.Types
   , Snowflake (..)
   )
 
--- Base
-import Data.Functor ((<&>))
-
 -------------------------------------------------------------------------------
 
 data PermLvl

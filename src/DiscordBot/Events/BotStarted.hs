@@ -13,13 +13,10 @@
 
 module DiscordBot.Events.BotStarted (onBotStarted) where
 
--- Ado Bot modules
-import DiscordBot.Utils (putLn)
-
 -- Downloaded libraries
 import Discord (DiscordHandler)
 
 -------------------------------------------------------------------------------
 
 onBotStarted :: DiscordHandler ()
-onBotStarted = putLn "Bot started."
+onBotStarted = putTextLn "Bot started."

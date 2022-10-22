@@ -1,11 +1,5 @@
 module Config.Type (BotConfig (..)) where
 
--- Downloaded libraries
-import Data.Text (Text)
-
--- Base
-import Data.Word (Word64)
-
 -------------------------------------------------------------------------------
 
 data BotConfig = BotConfig

@@ -10,7 +10,6 @@ module DiscordBot.SlashCommand
   ) where
 
 -- Downloaded libraries
-import Data.Text     (Text)
 import Discord       (DiscordHandler)
 import Discord.Types (GuildMember, InteractionId, InteractionToken)
 

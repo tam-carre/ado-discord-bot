@@ -1,4 +1,4 @@
-cabal-version: 1.12
+cabal-version: 2.0
 
 -- This file has been generated from package.yaml by hpack version 0.35.0.
 --
@@ -37,27 +37,31 @@ library
       DiscordBot.Perms
       DiscordBot.SendMessage
       DiscordBot.SlashCommand
-      DiscordBot.Utils
   other-modules:
+      Paths_ado_discord_bot
+  autogen-modules:
       Paths_ado_discord_bot
   hs-source-dirs:
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
-    , containers
     , discord-haskell
     , emoji
     , hspec
     , hspec-contrib
-    , mtl
-    , text
+    , relude
     , unliftio
+  mixins:
+      base hiding (Prelude)
+    , relude (Relude as Prelude)
   default-language: Haskell2010
 
 executable ado-discord-bot-exe
   main-is: Main.hs
   other-modules:
+      Paths_ado_discord_bot
+  autogen-modules:
       Paths_ado_discord_bot
   hs-source-dirs:
       app
@@ -65,14 +69,15 @@ executable ado-discord-bot-exe
   build-depends:
       ado-discord-bot
     , base >=4.7 && <5
-    , containers
     , discord-haskell
     , emoji
     , hspec
     , hspec-contrib
-    , mtl
-    , text
+    , relude
     , unliftio
+  mixins:
+      base hiding (Prelude)
+    , relude (Relude as Prelude)
   default-language: Haskell2010
 
 test-suite ado-discord-bot-test
@@ -80,18 +85,21 @@ test-suite ado-discord-bot-test
   main-is: Spec.hs
   other-modules:
       Paths_ado_discord_bot
+  autogen-modules:
+      Paths_ado_discord_bot
   hs-source-dirs:
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       ado-discord-bot
     , base >=4.7 && <5
-    , containers
     , discord-haskell
     , emoji
     , hspec
     , hspec-contrib
-    , mtl
-    , text
+    , relude
     , unliftio
+  mixins:
+      base hiding (Prelude)
+    , relude (Relude as Prelude)
   default-language: Haskell2010

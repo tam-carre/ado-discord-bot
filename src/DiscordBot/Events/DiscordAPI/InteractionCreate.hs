@@ -10,7 +10,6 @@ module DiscordBot.Events.DiscordAPI.InteractionCreate
 import DiscordBot.SendMessage  (reply)
 import DiscordBot.Commands     (cmdByName)
 import DiscordBot.SlashCommand (SlashCommand (..))
-import DiscordBot.Utils        (putLn)
 import DiscordBot.Perms        (getPermLvl)
 
 -- Downloaded libraries
@@ -37,8 +36,8 @@ onInteractionCreate = \case
                 else  found.handler intr mem slash.optionsData
                 where intr = (cmd.interactionId, cmd.interactionToken)
 
-            _ -> putLn "Got slash cmd w/ no guild member (member likely left)"
+            _ -> putTextLn "Got slash cmd w/ no guild member (they likely left)"
 
-        Nothing -> putLn "Somehow got unknown slash command"
+        Nothing -> putTextLn "Somehow got unknown slash command"
 
   _ -> pure ()

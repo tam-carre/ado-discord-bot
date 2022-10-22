@@ -13,19 +13,18 @@ import DiscordBot.Events.BotStarted (onBotStarted)
 import Discord       (runDiscord, def, RunDiscordOpts (..))
 import Discord.Types (GatewayIntent (..))
 
-import qualified Data.Text.IO as TIO
-
 ------------------------------------------------------------------------------
 
 main :: IO ()
 main = do
-  TIO.putStrLn "Application started."
+  putTextLn "Application started."
+  botTerminationError <- runDiscord settings
+  putTextLn $ "A fatal error occurred: " <> botTerminationError
 
-  botTerminationError <- runDiscord $ def
-    { discordToken         = botConfig.botToken
-    , discordOnEvent       = onDiscordEvent
-    , discordOnStart       = onBotStarted
-    , discordGatewayIntent = def { gatewayIntentMessageContent = False }
-    }
-
-  TIO.putStrLn $ "A fatal error occurred:" <> botTerminationError
+settings :: RunDiscordOpts
+settings = def
+  { discordToken         = botConfig.botToken
+  , discordOnEvent       = onDiscordEvent
+  , discordOnStart       = onBotStarted
+  , discordGatewayIntent = def { gatewayIntentMessageContent = False }
+  }
