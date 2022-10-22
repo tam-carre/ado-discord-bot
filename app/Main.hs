@@ -17,9 +17,9 @@ import Discord.Types (GatewayIntent (..))
 
 main :: IO ()
 main = do
-  putTextLn "Application started."
+  echo "Application started."
   botTerminationError <- runDiscord settings
-  putTextLn $ "A fatal error occurred: " <> botTerminationError
+  echo $ "A fatal error occurred: " <> botTerminationError
 
 settings :: RunDiscordOpts
 settings = def

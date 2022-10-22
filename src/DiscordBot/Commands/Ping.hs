@@ -32,9 +32,9 @@ ping = slash $ SlashProps
               Just inputOption ->
                 case optionDataValueString inputOption of
                   Right input -> replyEmbed (iId, iToken) input
-                  Left err -> putTextLn $ "Misconfigured command: " <> err
+                  Left err -> echo $ "Misconfigured command: " <> err
 
-              _ -> putTextLn "Misconfigured command"
+              _ -> echo "Misconfigured command"
 
-          _ -> putTextLn "Misconfigured command"
+          _ -> echo "Misconfigured command"
   }

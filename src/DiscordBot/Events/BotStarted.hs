@@ -19,4 +19,4 @@ import Discord (DiscordHandler)
 -------------------------------------------------------------------------------
 
 onBotStarted :: DiscordHandler ()
-onBotStarted = putTextLn "Bot started."
+onBotStarted = echo "Bot started."

@@ -7,12 +7,8 @@ import DiscordBot.Events.DiscordAPI.Ready             (onReady)
 import DiscordBot.Events.DiscordAPI.InteractionCreate (onInteractionCreate)
 
 -- Downloaded libraries
-import Discord (DiscordHandler)
-
-import Discord.Types
-  ( Event (..)
-  , PartialApplication (..)
-  )
+import Discord       (DiscordHandler)
+import Discord.Types (Event (..), PartialApplication (..))
 
 -------------------------------------------------------------------------------
 
@@ -27,4 +23,4 @@ onDiscordEvent :: Event -> DiscordHandler ()
 onDiscordEvent = \case
   Ready _ _ _ _ _ _ (PartialApplication appId _) -> onReady appId
   InteractionCreate intr                         -> onInteractionCreate intr
-  _                                              -> pure ()
+  _                                              -> pass

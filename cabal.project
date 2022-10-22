@@ -2,6 +2,7 @@ executable ado-discord-bot
   main-is:             src/Main.hs
   default-language:    Haskell2010
   ghc-options:         -threaded
+  exposed-modules:     Prelude
   build-depends:       base
                      , text
                      , discord-haskell

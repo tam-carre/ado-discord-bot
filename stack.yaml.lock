@@ -18,6 +18,17 @@ packages:
       size: 3241
   original:
     hackage: discord-haskell-1.15.3
+- completed:
+    name: base-noprelude
+    pantry-tree:
+      sha256: 8efde0acdfcaa5f8b01f4b954d60df7abd3aad48109080a87c696f8315c61eac
+      size: 823
+    sha256: d4d029b39d836ea5c5692b73f0811f3c68c7a2c5ec0627b4a8d921de469505c7
+    size: 4624
+    url: https://github.com/tam-carre/base-noprelude/archive/678164275dbd800f005720dd0798a2d77e7c04f9.tar.gz
+    version: 4.16.3.0
+  original:
+    url: https://github.com/tam-carre/base-noprelude/archive/678164275dbd800f005720dd0798a2d77e7c04f9.tar.gz
 snapshots:
 - completed:
     sha256: d3ba2e94c3ccbd3da4949243c83b59667c5eb9ffc7646148661c16741bbad1d4

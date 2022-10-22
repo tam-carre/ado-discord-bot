@@ -12,13 +12,8 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/tam-carre/ado-discord-bot#readme>
 
 dependencies:
-- name: base
-  version: ">= 4.7 && < 5"
-  mixin:
-    - hiding (Prelude)
-- name: relude
-  mixin:
-    - (Relude as Prelude)
+- base-noprelude
+- relude
 - hspec
 - hspec-contrib
 - discord-haskell

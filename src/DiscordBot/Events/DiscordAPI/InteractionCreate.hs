@@ -36,8 +36,8 @@ onInteractionCreate = \case
                 else  found.handler intr mem slash.optionsData
                 where intr = (cmd.interactionId, cmd.interactionToken)
 
-            _ -> putTextLn "Got slash cmd w/ no guild member (they likely left)"
+            _ -> echo "Got slash cmd w/ no guild member (they likely left)"
 
-        Nothing -> putTextLn "Somehow got unknown slash command"
+        Nothing -> echo "Somehow got unknown slash command"
 
-  _ -> pure ()
+  _ -> pass
