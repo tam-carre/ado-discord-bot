@@ -28,8 +28,8 @@ import qualified Data.Map.Lazy as Map
 -------------------------------------------------------------------------------
 
 data GuildSettings = GuildSettings
-  { communityPostChannels :: [Word64]
-  , secretBaseChannels    :: [Word64]
+  { communityPostChannels :: Maybe Word64
+  , secretBaseChannels    :: Maybe Word64
   , communityPostRole     :: Maybe Word64
   , secretBaseRole        :: Maybe Word64
   }
@@ -46,7 +46,8 @@ upsert guildId new = put . setByGuildId guildId new =<< get
 
 byGuildId :: Word64 -> Db -> GuildSettings
 byGuildId guildId (Db allS) =
-  fromMaybe (GuildSettings [] [] Nothing Nothing) $ Map.lookup guildId allS
+  fromMaybe (GuildSettings Nothing Nothing Nothing Nothing)
+    $ Map.lookup guildId allS
 
 setByGuildId :: Word64 -> GuildSettings -> Db -> Db
 setByGuildId guildId new (Db allS) = Db $ Map.insert guildId new allS
