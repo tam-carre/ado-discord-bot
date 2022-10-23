@@ -7,10 +7,11 @@ module DiscordBot.Events.DiscordAPI.InteractionCreate
   ) where
 
 -- Ado Bot modules
-import DiscordBot.SendMessage  (reply)
-import DiscordBot.Commands     (cmdByName)
-import DiscordBot.SlashCommand (SlashCommand (..))
-import DiscordBot.Perms        (getPermLvl)
+import DiscordBot.Guilds.Settings (SettingsDb, getSettings)
+import DiscordBot.SendMessage     (reply)
+import DiscordBot.Commands        (cmdByName)
+import DiscordBot.SlashCommand    (SlashCommand (..))
+import DiscordBot.Perms           (getPermLvl)
 
 -- Downloaded libraries
 import Discord (DiscordHandler)
@@ -20,24 +21,28 @@ import Discord.Interactions
   , ApplicationCommandData (..)
   , MemberOrUser (..)
   )
+import Data.Acid (AcidState)
 
 -------------------------------------------------------------------------------
 
-onInteractionCreate :: Interaction -> DiscordHandler ()
-onInteractionCreate = \case
+onInteractionCreate :: AcidState SettingsDb -> Interaction -> DiscordHandler ()
+onInteractionCreate db = \case
   cmd@InteractionApplicationCommand
     { applicationCommandData = slash@ApplicationCommandDataChatInput {} } ->
       case cmdByName slash.applicationCommandDataName of
         Just found ->
-          case cmd.interactionUser of
-            MemberOrUser (Left mem) ->
-              if getPermLvl mem < found.permLvl
+          case (cmd.interactionUser, cmd.interactionGuildId) of
+            (MemberOrUser (Left mem), Just guildId) -> do
+              gSettings <- getSettings guildId
+              if getPermLvl gSettings mem < found.permLvl
                 then  reply intr "Insufficient permissions."
-                else  found.handler intr mem slash.optionsData
+                else  found.handler db intr mem guildId slash.optionsData
                 where intr = (cmd.interactionId, cmd.interactionToken)
+
+            (_, Nothing) -> echo "Got slash cmd w/o channel (channel deleted?)"
 
             _ -> echo "Got slash cmd w/ no guild member (they likely left)"
 
-        Nothing -> echo "Somehow got unknown slash command"
+        Nothing -> echo "Somehow got unknown slash command (registrations out of date?)"
 
-  _ -> pass
+  _ -> pass -- Unexpected/unsupported interaction type

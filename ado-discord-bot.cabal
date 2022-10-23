@@ -29,6 +29,8 @@ library
       Config.Tokens
       Config.Type
       DiscordBot.Commands
+      DiscordBot.Commands.Community
+      DiscordBot.Commands.ModRole
       DiscordBot.Commands.Ping
       DiscordBot.Events
       DiscordBot.Events.BotStarted

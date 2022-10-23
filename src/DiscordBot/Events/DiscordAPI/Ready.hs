@@ -1,4 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LambdaCase #-}
 
 module DiscordBot.Events.DiscordAPI.Ready (onReady) where
 
@@ -19,9 +20,12 @@ onReady appId = do
 
   appCmdRegistrations <- mapM tryRegistering appCommands
 
-  echo $ if all isRight appCmdRegistrations
-    then "Registered " <> show (length appCmdRegistrations) <> " command(s)."
-    else "[!] Failed to register some commands."
+  if all isRight appCmdRegistrations then
+    echo $ "Registered " <> show (length appCmdRegistrations) <> " command(s)."
+
+  else do
+    echo "[!] Failed to register some commands. (Are your cmd names lowercase?)"
+    mapM_ (echo . show) $ lefts appCmdRegistrations
 
   where
   tryRegistering cmd = case registration cmd of

@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE OverloadedRecordDot #-}
 
 module Main (main) where
 
@@ -8,23 +7,26 @@ import Config.BotConfig             (botConfig)
 import Config.Type                  (BotConfig (..))
 import DiscordBot.Events            (onDiscordEvent)
 import DiscordBot.Events.BotStarted (onBotStarted)
+import DiscordBot.Guilds.Settings   (getSettingsDb, SettingsDb)
 
 -- Downloaded libraries
 import Discord       (runDiscord, def, RunDiscordOpts (..))
 import Discord.Types (GatewayIntent (..))
+import Data.Acid     (AcidState)
 
 ------------------------------------------------------------------------------
 
 main :: IO ()
 main = do
   echo "Application started."
-  botTerminationError <- runDiscord settings
+  settingsDb          <- getSettingsDb
+  botTerminationError <- runDiscord $ options settingsDb
   echo $ "A fatal error occurred: " <> botTerminationError
 
-settings :: RunDiscordOpts
-settings = def
-  { discordToken         = botConfig.botToken
-  , discordOnEvent       = onDiscordEvent
+options :: AcidState SettingsDb -> RunDiscordOpts
+options settingsDb = def
+  { discordToken         = botToken botConfig
+  , discordOnEvent       = onDiscordEvent settingsDb
   , discordOnStart       = onBotStarted
   , discordGatewayIntent = def { gatewayIntentMessageContent = False }
   }

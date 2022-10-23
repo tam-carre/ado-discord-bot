@@ -1,12 +1,17 @@
 {-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE LambdaCase #-}
 
 module DiscordBot.Guilds.Settings
   ( GuildSettings (..)
+  , SettingsDb
   , getSettings
+  , getSettingsDb
   , changeSettings
+  , dId
+  , w64
   ) where
 
 -- Downloaded libraries
@@ -23,51 +28,61 @@ import Data.Acid
   )
 
 -- Base
+import Control.Exception (catch)
+
 import qualified Data.Map.Lazy as Map
 
 -------------------------------------------------------------------------------
 
 data GuildSettings = GuildSettings
-  { communityPostChannels :: Maybe Word64
-  , secretBaseChannels    :: Maybe Word64
+  { communityPostCh       :: Maybe Word64
+  , secretBaseCh          :: Maybe Word64
   , communityPostRole     :: Maybe Word64
   , secretBaseRole        :: Maybe Word64
+  , modRole               :: Maybe Word64
   }
 $(deriveSafeCopy 0 'base ''GuildSettings)
 
-newtype Db = Db (Map Word64 GuildSettings)
-$(deriveSafeCopy 0 'base ''Db)
+newtype SettingsDb = SettingsDb (Map Word64 GuildSettings)
+$(deriveSafeCopy 0 'base ''SettingsDb)
 
-findOne :: Word64 -> Query Db GuildSettings
+findOne :: Word64 -> Query SettingsDb GuildSettings
 findOne guildId = byGuildId guildId <$> ask
 
-upsert :: Word64 -> GuildSettings -> Update Db ()
+upsert :: Word64 -> GuildSettings -> Update SettingsDb ()
 upsert guildId new = put . setByGuildId guildId new =<< get
 
-byGuildId :: Word64 -> Db -> GuildSettings
-byGuildId guildId (Db allS) =
-  fromMaybe (GuildSettings Nothing Nothing Nothing Nothing)
+byGuildId :: Word64 -> SettingsDb -> GuildSettings
+byGuildId guildId (SettingsDb allS) =
+  fromMaybe (GuildSettings Nothing Nothing Nothing Nothing Nothing)
     $ Map.lookup guildId allS
 
-setByGuildId :: Word64 -> GuildSettings -> Db -> Db
-setByGuildId guildId new (Db allS) = Db $ Map.insert guildId new allS
+setByGuildId :: Word64 -> GuildSettings -> SettingsDb -> SettingsDb
+setByGuildId guildId new (SettingsDb allS) = SettingsDb $ Map.insert guildId new allS
 
-$(makeAcidic ''Db ['findOne, 'upsert])
+$(makeAcidic ''SettingsDb ['findOne, 'upsert])
 
-getDb :: IO (AcidState Db)
-getDb = openLocalState (Db Map.empty)
+getSettingsDb :: IO (AcidState SettingsDb)
+getSettingsDb = openLocalState (SettingsDb Map.empty)
+  `catch` \e -> die $ "Problem accessing DB: " <> show (e :: SomeException)
 
-getWithDb :: DiscordId a -> AcidState Db -> IO GuildSettings
-getWithDb guildId db = query db . FindOne $ w64 guildId
+getWithSettingsDb :: DiscordId a -> AcidState SettingsDb -> IO GuildSettings
+getWithSettingsDb guildId db = query db . FindOne $ w64 guildId
 
 w64 :: DiscordId a -> Word64
 w64 = unSnowflake . unId
 
-getSettings :: MonadIO m => DiscordId a -> m GuildSettings
-getSettings = liftIO . (getDb >>=) . getWithDb
+dId :: DiscordId a -> Maybe Word64
+dId = Just . w64
 
-changeSettings :: MonadIO m => DiscordId a -> (GuildSettings -> GuildSettings) -> m ()
-changeSettings guildId f = liftIO $ do
-  db  <- getDb
-  old <- getWithDb guildId db
+getSettings :: MonadIO m => DiscordId a -> m GuildSettings
+getSettings = liftIO . (getSettingsDb >>=) . getWithSettingsDb
+
+changeSettings :: MonadIO m
+  => AcidState SettingsDb
+  -> DiscordId a
+  -> (GuildSettings -> GuildSettings)
+  -> m ()
+changeSettings db guildId f = liftIO $ do
+  old <- getWithSettingsDb guildId db
   update db $ Upsert (w64 guildId) (f old)
