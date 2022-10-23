@@ -30,8 +30,11 @@ library
       Config.Type
       DiscordBot.Commands
       DiscordBot.Commands.Community
+      DiscordBot.Commands.CommunityRole
       DiscordBot.Commands.ModRole
       DiscordBot.Commands.Ping
+      DiscordBot.Commands.SecretBase
+      DiscordBot.Commands.SecretBaseRole
       DiscordBot.Events
       DiscordBot.Events.BotStarted
       DiscordBot.Events.DiscordAPI.InteractionCreate
