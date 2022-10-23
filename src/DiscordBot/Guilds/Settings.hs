@@ -7,7 +7,7 @@
 module DiscordBot.Guilds.Settings
   ( GuildSettings (..)
   , SettingsDb
-  , getSettings
+  , getSettingsWithDb
   , getSettingsDb
   , changeSettings
   , dId
@@ -28,7 +28,7 @@ import Data.Acid
   )
 
 -- Base
-import Control.Exception (catch)
+import Control.Exception (handle)
 
 import qualified Data.Map.Lazy as Map
 
@@ -43,7 +43,7 @@ data GuildSettings = GuildSettings
   }
 $(deriveSafeCopy 0 'base ''GuildSettings)
 
-newtype SettingsDb = SettingsDb (Map Word64 GuildSettings)
+data SettingsDb = SettingsDb !(Map Word64 GuildSettings)
 $(deriveSafeCopy 0 'base ''SettingsDb)
 
 findOne :: Word64 -> Query SettingsDb GuildSettings
@@ -64,10 +64,11 @@ $(makeAcidic ''SettingsDb ['findOne, 'upsert])
 
 getSettingsDb :: IO (AcidState SettingsDb)
 getSettingsDb = openLocalState (SettingsDb Map.empty)
-  `catch` \e -> die $ "Problem accessing DB: " <> show (e :: SomeException)
+  & tap (\_ -> echo "Successfully connected to the DB")
+  & handle (\e -> die $ "Problem accessing DB: " <> show (e :: SomeException))
 
-getWithSettingsDb :: DiscordId a -> AcidState SettingsDb -> IO GuildSettings
-getWithSettingsDb guildId db = query db . FindOne $ w64 guildId
+getSettingsWithDb :: MonadIO m => AcidState SettingsDb -> DiscordId a -> m GuildSettings
+getSettingsWithDb db guildId = liftIO . query db . FindOne $ w64 guildId
 
 w64 :: DiscordId a -> Word64
 w64 = unSnowflake . unId
@@ -75,14 +76,11 @@ w64 = unSnowflake . unId
 dId :: DiscordId a -> Maybe Word64
 dId = Just . w64
 
-getSettings :: MonadIO m => DiscordId a -> m GuildSettings
-getSettings = liftIO . (getSettingsDb >>=) . getWithSettingsDb
-
 changeSettings :: MonadIO m
   => AcidState SettingsDb
   -> DiscordId a
   -> (GuildSettings -> GuildSettings)
   -> m ()
 changeSettings db guildId f = liftIO $ do
-  old <- getWithSettingsDb guildId db
+  old <- getSettingsWithDb db guildId
   update db $ Upsert (w64 guildId) (f old)

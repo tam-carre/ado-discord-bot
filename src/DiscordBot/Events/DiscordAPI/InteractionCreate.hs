@@ -7,7 +7,7 @@ module DiscordBot.Events.DiscordAPI.InteractionCreate
   ) where
 
 -- Ado Bot modules
-import DiscordBot.Guilds.Settings (SettingsDb, getSettings)
+import DiscordBot.Guilds.Settings (SettingsDb, getSettingsWithDb)
 import DiscordBot.SendMessage     (reply)
 import DiscordBot.Commands        (cmdByName)
 import DiscordBot.SlashCommand    (SlashCommand (..))
@@ -33,7 +33,7 @@ onInteractionCreate db = \case
         Just found ->
           case (cmd.interactionUser, cmd.interactionGuildId) of
             (MemberOrUser (Left mem), Just guildId) -> do
-              gSettings <- getSettings guildId
+              gSettings <- getSettingsWithDb db guildId
               if getPermLvl gSettings mem < found.permLvl
                 then  reply intr "Insufficient permissions."
                 else  found.handler db intr mem guildId slash.optionsData
