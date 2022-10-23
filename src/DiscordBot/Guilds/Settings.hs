@@ -63,11 +63,11 @@ getWithDb guildId db = query db . FindOne $ w64 guildId
 w64 :: DiscordId a -> Word64
 w64 = unSnowflake . unId
 
-getSettings :: DiscordId a -> IO GuildSettings
-getSettings = (getDb >>=) . getWithDb
+getSettings :: MonadIO m => DiscordId a -> m GuildSettings
+getSettings = liftIO . (getDb >>=) . getWithDb
 
-changeSettings :: DiscordId a -> (GuildSettings -> GuildSettings) -> IO ()
-changeSettings guildId f = do
+changeSettings :: MonadIO m => DiscordId a -> (GuildSettings -> GuildSettings) -> m ()
+changeSettings guildId f = liftIO $ do
   db  <- getDb
   old <- getWithDb guildId db
   update db $ Upsert (w64 guildId) (f old)
