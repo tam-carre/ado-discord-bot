@@ -18,11 +18,13 @@
 module DiscordBot.Events.BotStarted (onBotStarted) where
 
 -- Ado Bot modules
-import Notifications.History                       (NotifHistoryDb)
-import Utils                                       (sleep)
-import DiscordBot.Guilds.Settings                  (SettingsDb)
-import DiscordBot.Events.NewCommunityPost          (onNewCommunityPost)
-import Notifications.YouTubeCommunityPosts.Watcher (getNextNewCommunityPost)
+import Notifications.History              (NotifHistoryDb)
+import Utils                              (sleep)
+import DiscordBot.Guilds.Settings         (SettingsDb)
+import DiscordBot.Events.NewCommunityPost (onNewCommunityPost)
+import DiscordBot.Events.NewSecretBase    (onNewSecretBase)
+import Notifications.YTCommunityPosts     (getNextNewCommunityPost)
+import Notifications.SecretBase           (getNextNewSecretBase)
 
 -- Downloaded libraries
 import Discord             (DiscordHandler)
@@ -38,20 +40,20 @@ onBotStarted ::
   -> DiscordHandler ()
 onBotStarted settingsDb notifHistoryDb = do
   echo "Bot started."
-
   void . forkIO $ do
     sleep 5 -- This may help waiting till the bot is ready
     echo "Starting notifiers."
     watch getNextNewCommunityPost onNewCommunityPost settingsDb notifHistoryDb
+    watch getNextNewSecretBase onNewSecretBase settingsDb notifHistoryDb
 
 watch ::
-  (AcidState NotifHistoryDb -> IO a)
+  (AcidState NotifHistoryDb -> DiscordHandler a)
   -> (AcidState SettingsDb -> a -> DiscordHandler ())
   -> AcidState SettingsDb
   -> AcidState NotifHistoryDb
   -> DiscordHandler ()
 watch watcher handler settingsDb notifHistoryDb = void . forkIO $ do
-  justCameOut <- liftIO $ watcher notifHistoryDb
+  justCameOut <- watcher notifHistoryDb
   void . forkIO $ handler settingsDb justCameOut
   sleep 30
   watch watcher handler settingsDb notifHistoryDb

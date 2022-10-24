@@ -1,17 +1,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE NamedFieldPuns #-}
 
-module Notifications.YouTubeCommunityPosts.Watcher
+module Notifications.YTCommunityPosts
   ( CommunityPost (..)
   , getNextNewCommunityPost
   ) where
 
 -- Ado Bot modules
-import Json  ((?.), (?!!), unArr, unStr)
-import Utils (betweenSubstrs, sleep)
+import Json                ((?.), (?!!), unArr, unStr)
+import Utils               (betweenSubstrs)
+import Notifications.Utils (returnWhenFound)
 import Notifications.History
   ( NotifHistoryDb (..)
   , getNotifHistory
@@ -22,7 +22,6 @@ import Notifications.History
 import Data.Acid  (AcidState)
 import Data.Text  (isInfixOf)
 import Data.Aeson (Value (..), decode)
-
 import Network.HTTP.Simple
   ( parseRequest
   , getResponseStatusCode
@@ -46,24 +45,18 @@ data CommunityPost = CommunityPost
   }
 
 -- | This function only returns once Ado uploads a fresh new community post
-getNextNewCommunityPost :: AcidState NotifHistoryDb -> IO CommunityPost
-getNextNewCommunityPost db = latestCommunityPost db >>= \case
-  Right postData -> do
-    echo "Found a new community post."
-    pure postData
-  Left err -> do
-    echo err
-    sleep 30
-    getNextNewCommunityPost db
+getNextNewCommunityPost :: MonadIO m => AcidState NotifHistoryDb -> m CommunityPost
+getNextNewCommunityPost = returnWhenFound latestCommunityPost "New community post"
 
 -- | Returns a freshly uploaded community post by Ado, or a Left explaining
 -- what problem it encountered.
-latestCommunityPost :: AcidState NotifHistoryDb -> IO (Either Text CommunityPost)
+latestCommunityPost :: MonadIO m => AcidState NotifHistoryDb -> m (Either Text CommunityPost)
 latestCommunityPost db = do
-  response <- httpBS . eng =<< get' url
+  request <- liftIO $ get' url
+  response <- httpBS . eng $ request
 
   let status  = getResponseStatusCode response
-  let jsonStr = getPayload . decodeUtf8 $ getResponseBody response
+      jsonStr = getPayload . decodeUtf8 $ getResponseBody response
 
   case (status, jsonStr) of
     (200, Just payload) -> case decode payload :: Maybe Value of
@@ -84,13 +77,13 @@ latestCommunityPost db = do
       _                             -> err "Found JSON but failed to decode"
 
     (200, Nothing) -> err "Failed to extract JSON from HTML source"
-    _              -> err "Non-200 status code for community post page"
+    _              -> err "Non-200 status code"
 
   where
   url  = "https://www.youtube.com/c/Ado1024/community"
   eng  = setRequestHeader "Accept-Language" ["en"]
   get' = parseRequest . ("GET " <>)
-  err  = pure . Left
+  err  = pure . Left . ("[Community] " <>)
 
 -- | Assesses a YouTube English-language relative datestring e.g. "1 hour ago"
 isToday :: Text -> Bool
@@ -102,7 +95,6 @@ getPayload :: Text -> Maybe L8.ByteString
 getPayload = fmap (Lazy.Encoding.encodeUtf8 . fromStrict)
   . betweenSubstrs "var ytInitialData = " ";</script>"
 
--- | Get the (id, date, content) out of the JSON payload
 extractData :: Value -> Maybe CommunityPost
 extractData ytData = do
   latestPost <- Just ytData

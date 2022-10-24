@@ -40,13 +40,17 @@ library
       DiscordBot.Events.DiscordAPI.InteractionCreate
       DiscordBot.Events.DiscordAPI.Ready
       DiscordBot.Events.NewCommunityPost
+      DiscordBot.Events.NewSecretBase
+      DiscordBot.Events.Notify
       DiscordBot.Guilds.Settings
       DiscordBot.Perms
       DiscordBot.SendMessage
       DiscordBot.SlashCommand
       Json
       Notifications.History
-      Notifications.YouTubeCommunityPosts.Watcher
+      Notifications.SecretBase
+      Notifications.Utils
+      Notifications.YTCommunityPosts
       Prelude
       Utils
   other-modules:
