@@ -13,4 +13,3 @@ secretBaseRoleCmd = roleCmd "secretbaserole"
   "will receive notifications for Ado's Secret Base streams"
   Optional
   $ \newVal settings -> settings { secretBaseRole = newVal }
-

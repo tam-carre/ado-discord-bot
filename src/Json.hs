@@ -10,11 +10,11 @@ import qualified Data.Aeson.KeyMap as KeyMap
 
 -- | Safely accessing a JSON object property (Optional Chaining)
 (?.) :: Maybe Value -> Key -> Maybe Value
-(?.) objMaybe prop    = objMaybe >>= unObj >>= KeyMap.lookup prop
+(?.) objMaybe prop = objMaybe >>= unObj >>= KeyMap.lookup prop
 
 -- | Safely accessing a JSON array element (JS equivalent: arr?.[index]?.)
 (?!!) :: Maybe Value -> Int -> Maybe Value
-(?!!) arrMaybe index  = arrMaybe >>= unArr >>= \v -> v !? index
+(?!!) arrMaybe index = arrMaybe >>= unArr >>= \v -> v !? index
 
 -- | Safely unwrapping a JSON value that you think is an Object into a KeyMap
 unObj :: Value -> Maybe Object
@@ -23,8 +23,8 @@ unObj _            = Nothing
 
 -- | Safely unwrapping JSON val that you think is an Array into a Vector
 unArr :: Value -> Maybe Array
-unArr (Array arr)   = Just arr
-unArr _             = Nothing
+unArr (Array arr) = Just arr
+unArr _           = Nothing
 
 -- | Safely unwrapping JSON val that you think is a String into a Text
 unStr :: Value -> Maybe Text

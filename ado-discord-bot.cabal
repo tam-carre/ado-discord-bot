@@ -25,7 +25,6 @@ source-repository head
 library
   exposed-modules:
       Config.BotConfig
-      Config.SampleBotConfig
       Config.Tokens
       Config.Type
       DiscordBot.Commands
