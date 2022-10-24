@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE LambdaCase #-}
 
 module DiscordBot.Events.DiscordAPI.Ready (onReady) where
 
@@ -8,9 +7,10 @@ import DiscordBot.Commands     (appCommands)
 import DiscordBot.SlashCommand (SlashCommand (..))
 
 -- Downloaded libraries
-import Discord          (DiscordHandler, RestCallErrorCode (..), restCall)
-import Discord.Types    (ApplicationId)
-import Discord.Requests (ApplicationCommandRequest (..))
+import Discord              (DiscordHandler, RestCallErrorCode (..), restCall)
+import Discord.Types        (ApplicationId)
+import Discord.Requests     (ApplicationCommandRequest (..))
+import Discord.Interactions (ApplicationCommand (..))
 
 -------------------------------------------------------------------------------
 
@@ -18,16 +18,30 @@ onReady :: ApplicationId -> DiscordHandler ()
 onReady appId = do
   echo "Bot ready!"
 
-  appCmdRegistrations <- mapM tryRegistering appCommands
+  appCmdRegistrations <- mapM (tryRegistering appId) appCommands
 
-  if all isRight appCmdRegistrations then
-    echo $ "Registered " <> show (length appCmdRegistrations) <> " command(s)."
+  case sequence appCmdRegistrations of
+    Left _err -> echo "[!] Failed to register some commands (must be lowercase)"
+    Right cmds -> do
+      echo $ "Registered " <> show (length cmds) <> " command(s)."
+      unregisterOutdatedCmds appId cmds
 
-  else do
-    echo "[!] Failed to register some commands. (Are your cmd names lowercase?)"
-    mapM_ (echo . show) $ lefts appCmdRegistrations
+tryRegistering ::
+  ApplicationId
+  -> SlashCommand
+  -> DiscordHandler (Either RestCallErrorCode ApplicationCommand)
+tryRegistering appId cmd = case registration cmd of
+  Just reg -> restCall    $ CreateGlobalApplicationCommand appId reg
+  Nothing  -> pure . Left $ RestCallErrorCode 0 "" ""
 
-  where
-  tryRegistering cmd = case registration cmd of
-    Just reg -> restCall    $ CreateGlobalApplicationCommand appId reg
-    Nothing  -> pure . Left $ RestCallErrorCode 0 "" ""
+unregisterOutdatedCmds :: ApplicationId -> [ApplicationCommand] -> DiscordHandler ()
+unregisterOutdatedCmds appId validCmds = do
+  registered <- restCall $ GetGlobalApplicationCommands appId
+  case registered of
+    Left err -> echo $ "Failed to get registered slash commands: " <> show err
+    Right cmds -> do
+      let validIds    = map applicationCommandId validCmds
+          outdatedIds = filter (`notElem` validIds)
+                      . map applicationCommandId
+                      $ cmds
+      mapM_ (restCall . DeleteGlobalApplicationCommand appId) outdatedIds

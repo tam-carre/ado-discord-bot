@@ -20,6 +20,16 @@ dependencies:
 - emoji
 - acid-state
 - safecopy
+- unliftio
+- servant
+- servant-client
+- http-client
+- aeson
+- http-conduit
+- bytestring
+- text
+- vector
+- containers
 
 ghc-options:
 - -Wall

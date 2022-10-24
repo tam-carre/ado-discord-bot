@@ -194,7 +194,7 @@ roleCmd name purpose isRequired setter = slash $ SlashProps
 
       replyEmbed intr $ case roleId of
         Nothing -> "Successfully unset the role which " <> purpose <> "."
-        Just id -> "Successfully set <@" <> show id <> "> as the role which "<> purpose <>"."
+        Just id -> "Successfully set <@&" <> show id <> "> as the role which "<> purpose <>"."
   }
 
 data IsOptionRequired
