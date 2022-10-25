@@ -24,9 +24,8 @@ source-repository head
 
 library
   exposed-modules:
-      Config.BotConfig
-      Config.Tokens
-      Config.Type
+      BotConfig
+      Deepl
       DiscordBot.Commands
       DiscordBot.Commands.Community
       DiscordBot.Commands.CommunityRole
@@ -46,11 +45,13 @@ library
       DiscordBot.SendMessage
       DiscordBot.SlashCommand
       Json
+      Network
       Notifications.History
       Notifications.SecretBase
       Notifications.Utils
       Notifications.YTCommunityPosts
       Prelude
+      Tokens
       Utils
   other-modules:
       Paths_ado_discord_bot

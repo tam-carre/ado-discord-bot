@@ -1,12 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Config.BotConfig (botConfig) where
+module BotConfig (botConfig, BotConfig (..)) where
 
 -- Ado Bot modules
-import Config.Type   (BotConfig (..))
-import Config.Tokens (discordProd, deepl) -- not version controlled obv
+import Tokens (discordProd, deepl) -- not version controlled obv
 
 -------------------------------------------------------------------------------
+
+data BotConfig = BotConfig
+  { botToken            :: Text
+  , deeplKey            :: Text
+  , ownerDebugChannelId :: Word64
+  , ownerUserId         :: Word64
+  , inviteUrl           :: Text
+  }
 
 botConfig :: BotConfig
 botConfig = BotConfig

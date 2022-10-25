@@ -1,4 +1,4 @@
-module Utils (tap, betweenSubstrs, decorate, sleep) where
+module Utils (tap, betweenSubstrs, decorate, sleep, (>>>=), (<&>>=)) where
 
 -- Downloaded libraries
 import Data.Text  (splitOn)
@@ -27,3 +27,16 @@ decorate left right input = left <> input <> right
 -- | takes seconds as argument
 sleep :: MonadIO m => Int -> m ()
 sleep = liftIO . threadDelay . (* 1000000)
+
+-- | e.g. you want to chain the `a` in `IO (Maybe a)` to another `IO (Maybe a)`
+-- or if you're using Network.fetchJson you want to chain the `a` in
+-- `MonadIO m => m (Either e a)` into another `m (Either e a)`
+(>>>=) :: (Monad m1, Monad m2, Traversable m2)
+  => m1 (m2 a)
+  -> (a -> m1 (m2 b))
+  -> m1 (m2 b)
+m1 >>>= f = m1 >>= (fmap join . mapM f)
+
+-- | e.g. you want to chain the `a`in `IO (Maybe a)` to a `Maybe b`
+(<&>>=) :: (Monad m1, Monad m2) => m1 (m2 a) -> (a -> m2 b) -> m1 (m2 b)
+m1 <&>>= f = m1 <&> (>>= f)

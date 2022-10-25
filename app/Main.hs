@@ -3,8 +3,7 @@
 module Main (main) where
 
 -- Ado Bot modules
-import Config.BotConfig             (botConfig)
-import Config.Type                  (BotConfig (..))
+import BotConfig                    (botConfig, BotConfig (..))
 import DiscordBot.Events            (onDiscordEvent)
 import DiscordBot.Events.BotStarted (onBotStarted)
 import DiscordBot.Guilds.Settings   (getSettingsDb)

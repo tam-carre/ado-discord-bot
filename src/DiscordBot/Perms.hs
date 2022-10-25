@@ -3,8 +3,7 @@
 module DiscordBot.Perms (PermLvl (..), getPermLvl) where
 
 -- Ado Bot modules
-import Config.BotConfig           (botConfig)
-import Config.Type                (BotConfig (..))
+import BotConfig                  (botConfig, BotConfig (..))
 import DiscordBot.Guilds.Settings (GuildSettings (..), w64)
 
 -- Downloaded libraries
