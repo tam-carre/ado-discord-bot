@@ -56,16 +56,16 @@ latestSecretBase db = fetchJson "Secret Base" jsonToLives url >>>= \case
   url = "https://nfc-api.ado-dokidokihimitsukichi-daigakuimo.com/fc/fanclub_sites/95/live_pages?page=1&live_type=1&per_page=1"
   err = pure . Left . ("[Secret Base] " <>)
 
-jsonToLives :: Value -> Maybe [SecretBaseLive]
+jsonToLives :: Value -> Either Text [SecretBaseLive]
 jsonToLives json = do
-  liveObjs <- Just json ?. "data" ?. "video_pages" ?. "list" >>= unArr
+  liveObjs <- pure json ?. "data" ?. "video_pages" ?. "list" >>= unArr
   let lives = traverse singleLiveJsonToHaskell (Vector.toList liveObjs)
   filter sblStarted <$> lives
 
-singleLiveJsonToHaskell :: Value -> Maybe SecretBaseLive
+singleLiveJsonToHaskell :: Value -> Either Text SecretBaseLive
 singleLiveJsonToHaskell json = do
-  let prop name = Just json ?. name >>= unStr
-      isStarted = isJust $ prop "live_started_at"
+  let prop name = pure json ?. name >>= unStr
+      isStarted = isRight $ prop "live_started_at"
 
   thumb <- prop "thumbnail_url"
   title <- prop "title"
@@ -73,7 +73,7 @@ singleLiveJsonToHaskell json = do
 
   let url = "https://ado-dokidokihimitsukichi-daigakuimo.com/video/" <> code
 
-  Just SecretBaseLive { sblThumb   = thumb
+  pure SecretBaseLive { sblThumb   = thumb
                       , sblDesc    = "Watch at <" <> url <> ">"
                       , sblTitle   = title
                       , sblUrl     = url

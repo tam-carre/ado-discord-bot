@@ -14,7 +14,7 @@ import Network.HTTP.Simple
 
 -------------------------------------------------------------------------------
 
-fetchJson :: MonadIO m => Text -> (Value -> Maybe b) -> Request -> m (Either Text b)
+fetchJson :: MonadIO m => Text -> (Value -> Either Text b) -> Request -> m (Either Text b)
 fetchJson context parser request = do
   resp <- httpJSONEither request
 
@@ -24,8 +24,6 @@ fetchJson context parser request = do
       err = pure . Left . (("[" <> context <> "] ") <>)
 
   case (status, json) of
-    (200, Right value) -> case parser value of
-      Nothing -> err "Failed to extract data out of JSON"
-      Just decoded -> pure $ Right decoded
+    (200, Right value) -> pure $ parser value
     (200, _) -> err "Failed to decode JSON"
     (code, resp') -> err (show code <> ": " <> show resp')

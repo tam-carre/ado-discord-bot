@@ -60,7 +60,7 @@ latestCommunityPost db = do
 
   case (status, jsonStr) of
     (200, Just payload) -> case decode payload :: Maybe Value of
-      Just (extractData -> Just post@(CommunityPost { postId, date })) ->
+      Just (extractData -> Right post@(CommunityPost { postId, date })) ->
         if isToday date then do
           notifHistory <- getNotifHistory db
           if postId `notElem` notifHistory.community then do
@@ -73,8 +73,8 @@ latestCommunityPost db = do
 
         else err "Found post but it's older than a day"
 
-      Just (extractData -> Nothing) -> err "Found JSON but couldn't extract post"
-      _                             -> err "Found JSON but failed to decode"
+      Just (extractData -> Left e) -> err $ "Failed to extract: " <> show e
+      _                            -> err "Found JSON but failed to decode"
 
     (200, Nothing) -> err "Failed to extract JSON from HTML source"
     _              -> err "Non-200 status code"
@@ -95,9 +95,9 @@ getPayload :: Text -> Maybe L8.ByteString
 getPayload = fmap (Lazy.Encoding.encodeUtf8 . fromStrict)
   . betweenSubstrs "var ytInitialData = " ";</script>"
 
-extractData :: Value -> Maybe CommunityPost
+extractData :: Value -> Either Text CommunityPost
 extractData ytData = do
-  latestPost <- Just ytData
+  latestPost <- pure ytData
     ?. "contents"
     ?. "twoColumnBrowseResultsRenderer"
     ?. "tabs" ?!! 3
@@ -111,25 +111,25 @@ extractData ytData = do
     ?. "post"
     ?. "backstagePostRenderer"
 
-  content' <- Just latestPost
+  content' <- pure latestPost
     ?. "contentText"
     ?. "runs"
    >>= unArr
-   >>= traverse (\el -> Just el ?. "text" >>= unStr)
+   >>= traverse (\el -> pure el ?. "text" >>= unStr)
    <&> Vector.foldr (<>) ""
 
   -- | relative date e.g. "1 hour ago"
-  date' <- Just latestPost
+  date' <- pure latestPost
     ?. "publishedTimeText"
     ?. "runs" ?!! 0
     ?. "text"
    >>= unStr
 
-  postId' <- Just latestPost ?. "postId" >>= unStr
+  postId' <- pure latestPost ?. "postId" >>= unStr
 
-  author' <- Just latestPost ?. "authorText" ?. "runs" ?!! 0 ?. "text" >>= unStr
+  author' <- pure latestPost ?. "authorText" ?. "runs" ?!! 0 ?. "text" >>= unStr
 
-  avatar' <- Just latestPost
+  avatar' <- pure latestPost
     ?. "authorThumbnail"
     ?. "thumbnails" ?!! 2
     ?. "url"

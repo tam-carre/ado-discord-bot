@@ -76,7 +76,7 @@ sendWithEmbed channelId txt emb = do
     , messageDetailedEmbeds  = Just [emb]
     }
   if isLeft result
-    then echo $ show result
+    then print result
     else pass
 
 sendWithEmbed' :: Word64 -> Text -> CreateEmbed -> DiscordHandler ()

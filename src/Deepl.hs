@@ -31,9 +31,9 @@ req txt = "POST https://api-free.deepl.com/v2/translate"
       , ("text", encodeUtf8 txt)
       ]
 
-parseTranslations :: Value -> Maybe (Text, Text)
+parseTranslations :: Value -> Either Text (Text, Text)
 parseTranslations json = do
-  tl         <- Just json ?. "translations" ?!! 0
-  sourceLang <- Just tl ?. "detected_source_language" >>= unStr
-  translated <- Just tl ?. "text" >>= unStr
+  tl         <- pure json ?. "translations" ?!! 0
+  sourceLang <- pure tl ?. "detected_source_language" >>= unStr
+  translated <- pure tl ?. "text" >>= unStr
   pure (sourceLang, translated)
