@@ -1,5 +1,5 @@
 {-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings   #-}
 
 module DiscordBot.Events.NewSecretBase (onNewSecretBase) where
 
@@ -18,9 +18,9 @@ onNewSecretBase :: AcidState SettingsDb -> SecretBaseLive -> DiscordHandler ()
 onNewSecretBase settingsDb live = notify settingsDb Notif
   { settingsToCh   = secretBaseCh
   , settingsToRole = secretBaseRole
-  , ncThumb        = Just live.sblThumb
-  , ncAuthor       = live.sblTitle
+  , nThumb         = Just live.sblThumb
+  , nAuthor        = live.sblTitle
   , embedContent   = live.sblDesc
   , embedUrl       = live.sblUrl
-  , msgTxt         = "Ado is live on Secret Base!"
+  , msgTxt         = Just "Ado is live on Secret Base!"
   }

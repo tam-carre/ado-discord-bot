@@ -29,6 +29,27 @@ packages:
     version: 4.16.3.0
   original:
     url: https://github.com/tam-carre/base-noprelude/archive/678164275dbd800f005720dd0798a2d77e7c04f9.tar.gz
+- completed:
+    hackage: process-streaming-0.9.3.0@sha256:5db7965bc2f6fe5b58598141411bc6c1787907b883bfae9d22027e9f4040a460,3356
+    pantry-tree:
+      sha256: 4d9d6cfb372de82b89ae52201077bd768686319ed2350380d00a2357c8427af3
+      size: 648
+  original:
+    hackage: process-streaming-0.9.3.0@sha256:5db7965bc2f6fe5b58598141411bc6c1787907b883bfae9d22027e9f4040a460,3356
+- completed:
+    hackage: conceit-0.5.0.0@sha256:c443cc867af659a754ce40fe2d37421af323e0b8b22fdb11b4dda591ad2f408d,840
+    pantry-tree:
+      sha256: bf4f84e4bf7b3f48e03dd21785d56c292cb2d9ad871dee3b2500c46715c713b4
+      size: 321
+  original:
+    hackage: conceit-0.5.0.0@sha256:c443cc867af659a754ce40fe2d37421af323e0b8b22fdb11b4dda591ad2f408d,840
+- completed:
+    hackage: pipes-transduce-0.4.4.0@sha256:30b7ee1324ff504d1f357ad8818923b854ee70270b91aedd90d88e3f5f37b073,2189
+    pantry-tree:
+      sha256: c90a7d0c8244bbf5a58ed4bd449b5b3c0cfdc5cb8824c9caf1c8cca4658fcb63
+      size: 647
+  original:
+    hackage: pipes-transduce-0.4.4.0@sha256:30b7ee1324ff504d1f357ad8818923b854ee70270b91aedd90d88e3f5f37b073,2189
 snapshots:
 - completed:
     sha256: d3ba2e94c3ccbd3da4949243c83b59667c5eb9ffc7646148661c16741bbad1d4

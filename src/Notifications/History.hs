@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE TypeFamilies       #-}
+{-# LANGUAGE LambdaCase         #-}
 
 module Notifications.History
   ( getNotifHistoryDb
@@ -31,8 +31,9 @@ import Control.Exception (handle)
 
 -------------------------------------------------------------------------------
 data NotifHistoryDb = NotifHistoryDb
-  { community :: [Text]
+  { community  :: [Text]
   , secretBase :: [Text]
+  , ytStream   :: [Text]
   }
 
 $(deriveSafeCopy 0 'base ''NotifHistoryDb)
@@ -55,7 +56,7 @@ $(makeAcidic ''NotifHistoryDb ['getHistory, 'upsert])
 
 -- | Get the notif history DB. Should be done once per runtime.
 getNotifHistoryDb :: IO (AcidState NotifHistoryDb)
-getNotifHistoryDb = openLocalState (NotifHistoryDb [] [])
+getNotifHistoryDb = openLocalState (NotifHistoryDb [] [] [])
   & tap (\_ -> echo "Successfully connected to the notification history DB")
   & handle (\e -> die $ "Problem accessing notification history: " <> show (e :: SomeException))
 

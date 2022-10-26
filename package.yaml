@@ -30,6 +30,8 @@ dependencies:
 - text
 - vector
 - containers
+- process
+- process-streaming
 
 ghc-options:
 - -Wall

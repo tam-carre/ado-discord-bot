@@ -1,7 +1,7 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE ViewPatterns        #-}
+{-# LANGUAGE NamedFieldPuns      #-}
 
 module Notifications.YTCommunityPosts
   ( CommunityPost (..)
@@ -29,7 +29,6 @@ import Network.HTTP.Simple
   , httpBS
   , setRequestHeader
   )
-
 import qualified Data.Text.Lazy.Encoding    as Lazy.Encoding
 import qualified Data.Vector                as Vector
 import qualified Data.ByteString.Lazy.Char8 as L8

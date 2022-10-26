@@ -24,6 +24,11 @@ extra-deps:
 - discord-haskell-1.15.3
 - github: tam-carre/base-noprelude
   commit: 678164275dbd800f005720dd0798a2d77e7c04f9
+- process-streaming-0.9.3.0@sha256:5db7965bc2f6fe5b58598141411bc6c1787907b883bfae9d22027e9f4040a460,3356
+- conceit-0.5.0.0@sha256:c443cc867af659a754ce40fe2d37421af323e0b8b22fdb11b4dda591ad2f408d,840
+- pipes-transduce-0.4.4.0@sha256:30b7ee1324ff504d1f357ad8818923b854ee70270b91aedd90d88e3f5f37b073,2189
+
+
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.

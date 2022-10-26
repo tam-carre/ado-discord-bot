@@ -5,7 +5,6 @@ module DiscordBot.Commands.Ping (pingCmd) where
 -- Ado Bot modules
 import DiscordBot.Perms       (PermLvl (..))
 import DiscordBot.SendMessage (replyEmbed)
-
 import DiscordBot.SlashCommand
   ( slash
   , SlashProps (..)

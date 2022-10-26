@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module DiscordBot.SendMessage
   ( reply
   , replyEmbed
@@ -13,9 +11,6 @@ module DiscordBot.SendMessage
 -- Downloaded libraries
 import Discord (DiscordHandler, restCall, def)
 import Discord.Requests (MessageDetailedOpts (..))
-
-import qualified Discord.Requests as R
-
 import Discord.Types
   ( InteractionId
   , InteractionToken
@@ -30,6 +25,7 @@ import Discord.Interactions
   , InteractionResponse (..)
   , InteractionResponseMessage (..)
   )
+import qualified Discord.Requests as R
 
 -------------------------------------------------------------------------------
 
@@ -62,12 +58,12 @@ intrRespMsg = InteractionResponseMessage
 resp :: InteractionId -> InteractionToken -> InteractionResponse -> DiscordHandler ()
 resp iId iToken = void . restCall . R.CreateInteractionResponse iId iToken
 
-send :: ChannelId -> Text -> DiscordHandler ()
-send channelId content = void . restCall $ R.CreateMessage channelId content
+send :: Text -> ChannelId -> DiscordHandler ()
+send content channelId = void . restCall $ R.CreateMessage channelId content
 
 -- | like `send` but accepts an unwrapped Word64
-send' :: Word64 -> Text -> DiscordHandler ()
-send' = send . DiscordId . Snowflake
+send' :: Text -> Word64 -> DiscordHandler ()
+send' content = send content . DiscordId . Snowflake
 
 sendWithEmbed :: ChannelId -> Text -> CreateEmbed -> DiscordHandler ()
 sendWithEmbed channelId txt emb = do

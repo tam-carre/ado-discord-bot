@@ -3,7 +3,7 @@
 module BotConfig (botConfig, BotConfig (..)) where
 
 -- Ado Bot modules
-import Tokens (discordProd, deepl) -- not version controlled obv
+import qualified Tokens -- not version controlled obv
 
 -------------------------------------------------------------------------------
 
@@ -17,9 +17,9 @@ data BotConfig = BotConfig
 
 botConfig :: BotConfig
 botConfig = BotConfig
-  { botToken = discordProd
+  { botToken = Tokens.discord
   , ownerDebugChannelId = 1031895573218983968
   , ownerUserId = 150696503428644864
-  , deeplKey = deepl
+  , deeplKey = Tokens.deepl
   , inviteUrl = "https://discordapp.com/oauth2/authorize?client_id=1031887395467046923&scope=bot&permissions=517543873600"
   }

@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.0.
+-- This file has been generated from package.yaml by hpack version 0.34.5.
 --
 -- see: https://github.com/sol/hpack
 
@@ -31,6 +31,7 @@ library
       DiscordBot.Commands.CommunityRole
       DiscordBot.Commands.ModRole
       DiscordBot.Commands.Ping
+      DiscordBot.Commands.Relay
       DiscordBot.Commands.SecretBase
       DiscordBot.Commands.SecretBaseRole
       DiscordBot.Events
@@ -39,6 +40,7 @@ library
       DiscordBot.Events.DiscordAPI.Ready
       DiscordBot.Events.NewCommunityPost
       DiscordBot.Events.NewSecretBase
+      DiscordBot.Events.NewYTStream
       DiscordBot.Events.Notify
       DiscordBot.Guilds.Settings
       DiscordBot.Perms
@@ -50,6 +52,7 @@ library
       Notifications.SecretBase
       Notifications.Utils
       Notifications.YTCommunityPosts
+      Notifications.YTLivestream
       Prelude
       Tokens
       Utils
@@ -70,6 +73,8 @@ library
     , hspec-contrib
     , http-client
     , http-conduit
+    , process
+    , process-streaming
     , relude
     , safecopy
     , servant
@@ -99,6 +104,8 @@ executable ado-discord-bot-exe
     , hspec-contrib
     , http-client
     , http-conduit
+    , process
+    , process-streaming
     , relude
     , safecopy
     , servant
@@ -129,6 +136,8 @@ test-suite ado-discord-bot-test
     , hspec-contrib
     , http-client
     , http-conduit
+    , process
+    , process-streaming
     , relude
     , safecopy
     , servant

@@ -7,6 +7,7 @@ import DiscordBot.Commands.ModRole        (modRoleCmd)
 import DiscordBot.Commands.SecretBase     (secretBaseCmd)
 import DiscordBot.Commands.CommunityRole  (communityRoleCmd)
 import DiscordBot.Commands.SecretBaseRole (secretBaseRoleCmd)
+import DiscordBot.Commands.Relay          (relayCmd)
 import DiscordBot.SlashCommand            (SlashCommand (..))
 
 -------------------------------------------------------------------------------
@@ -19,6 +20,7 @@ appCommands =
   , communityRoleCmd
   , secretBaseRoleCmd
   , modRoleCmd
+  , relayCmd
   ]
 
 cmdByName :: Text -> Maybe SlashCommand

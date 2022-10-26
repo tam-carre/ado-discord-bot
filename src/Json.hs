@@ -5,7 +5,6 @@ module Json ((?.), (?!!), unObj, unArr, unStr) where
 -- Downloaded libraries
 import Data.Vector ((!?))
 import Data.Aeson  (Value (..), Key, Object, Array)
-
 import qualified Data.Aeson.KeyMap as KM
 
 -------------------------------------------------------------------------------

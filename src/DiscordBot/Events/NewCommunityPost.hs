@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE LambdaCase          #-}
+{-# LANGUAGE OverloadedStrings   #-}
 
 module DiscordBot.Events.NewCommunityPost (onNewCommunityPost) where
 
@@ -21,11 +21,11 @@ onNewCommunityPost db post = do
   notify db Notif
     { settingsToCh   = communityPostCh
     , settingsToRole = communityPostRole
-    , ncThumb        = Just post.avatar
-    , ncAuthor       = post.author
+    , nThumb         = Just post.avatar
+    , nAuthor        = post.author
     , embedContent   = post.content
     , embedUrl       = "https://youtube.com/post/" <> post.postId
-    , msgTxt         = "Ado has just published a community post! \n"
+    , msgTxt         = Just $ "Ado has just published a community post! \n"
                     <> "<https://youtube.com/post/" <> post.postId <> ">"
     }
 
@@ -34,9 +34,9 @@ onNewCommunityPost db post = do
     Right tl -> notify db Notif
       { settingsToCh   = communityPostCh
       , settingsToRole = const Nothing
-      , ncThumb        = Just post.avatar
-      , ncAuthor       = post.author
-      , embedContent   = tl
+      , nThumb         = Nothing
+      , nAuthor        = ""
+      , embedContent   = "*[DeepL]* " <> tl
       , embedUrl       = "https://youtube.com/post/" <> post.postId
-      , msgTxt         = "DeepL thinks the translation for the above post is:"
+      , msgTxt         = Nothing
       }

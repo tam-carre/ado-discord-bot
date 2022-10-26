@@ -1,13 +1,12 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE TupleSections       #-}
 {-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings   #-}
 
 module DiscordBot.Events.Notify (notify, Notif (..)) where
 
 -- Ado Bot modules
 import DiscordBot.SendMessage (sendWithEmbed', embed)
 import Utils                  (decorate)
-
 import DiscordBot.Guilds.Settings
   ( SettingsDb
   , getAllSettings
@@ -18,7 +17,6 @@ import DiscordBot.Guilds.Settings
 import Data.Acid     (AcidState)
 import Discord       (DiscordHandler)
 import Discord.Types (CreateEmbed (..), CreateEmbedImage (..))
-
 import qualified Data.Map  as Map
 import qualified Data.Text as Text
 
@@ -27,30 +25,32 @@ import qualified Data.Text as Text
 data Notif = Notif
   { settingsToCh   :: GuildSettings -> Maybe Word64
   , settingsToRole :: GuildSettings -> Maybe Word64
-  , ncThumb        :: Maybe Text
-  , ncAuthor       :: Text
+  , nThumb         :: Maybe Text
+  , nAuthor        :: Text
   , embedContent   :: Text
   , embedUrl       :: Text
-  , msgTxt         :: Text
+  , msgTxt         :: Maybe Text
   }
 
 notify :: AcidState SettingsDb -> Notif -> DiscordHandler ()
-notify db nc = do
+notify db n = do
   allSettings     <- getAllSettings db
-  let chAndRole gs = nc.settingsToCh gs <&> (, nc.settingsToRole gs)
+  let chAndRole gs = n.settingsToCh gs <&> (, n.settingsToRole gs)
       pendingMsgs  = mapMaybe chAndRole $ Map.elems allSettings
-      avvie        = CreateEmbedImageUrl <$> nc.ncThumb
-      embedTxt     = if Text.length nc.embedContent < 2000
-                       then nc.embedContent
-                       else Text.take 1999 nc.embedContent <> "…"
-      msgEmbed     = embed { createEmbedAuthorName  = nc.ncAuthor
+      avvie        = CreateEmbedImageUrl <$> n.nThumb
+      embedTxt     = if Text.length n.embedContent < 2000
+                       then n.embedContent
+                       else Text.take 1999 n.embedContent <> "…"
+      msgEmbed     = embed { createEmbedAuthorName  = n.nAuthor
                            , createEmbedAuthorIcon  = avvie
                            , createEmbedThumbnail   = avvie
                            , createEmbedDescription = embedTxt
-                           , createEmbedUrl         = nc.embedUrl
+                           , createEmbedUrl         = n.embedUrl
                            }
-      msg role     = ":loudspeaker: "
-                  <> maybe "" (decorate "<@&" "> " . show) role
-                  <> nc.msgTxt
+      msg role     = case n.msgTxt of
+                       Nothing -> ""
+                       Just txt -> ":loudspeaker: "
+                                <> maybe "" (decorate "<@&" "> " . show) role
+                                <> txt
 
   forM_ pendingMsgs $ \(ch, role) -> sendWithEmbed' ch (msg role) msgEmbed

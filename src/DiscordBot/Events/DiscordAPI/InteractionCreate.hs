@@ -1,5 +1,5 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE LambdaCase          #-}
 {-# LANGUAGE OverloadedRecordDot #-}
 
 module DiscordBot.Events.DiscordAPI.InteractionCreate
@@ -16,7 +16,6 @@ import DiscordBot.Perms           (getPermLvl)
 -- Downloaded libraries
 import Discord   (DiscordHandler)
 import Data.Acid (AcidState)
-
 import Discord.Interactions
   ( Interaction (..)
   , ApplicationCommandData (..)

@@ -23,6 +23,7 @@ import Utils                              (sleep)
 import DiscordBot.Guilds.Settings         (SettingsDb)
 import DiscordBot.Events.NewCommunityPost (onNewCommunityPost)
 import DiscordBot.Events.NewSecretBase    (onNewSecretBase)
+import DiscordBot.Events.NewYTStream      (onNewYTStream)
 import Notifications.YTCommunityPosts     (getNextNewCommunityPost)
 import Notifications.SecretBase           (getNextNewSecretBase)
 
@@ -30,6 +31,7 @@ import Notifications.SecretBase           (getNextNewSecretBase)
 import Discord             (DiscordHandler)
 import Data.Acid           (AcidState)
 import UnliftIO.Concurrent (forkIO)
+import Notifications.YTLivestream (getNextNewLivestream)
 
 -------------------------------------------------------------------------------
 
@@ -38,13 +40,14 @@ onBotStarted ::
   AcidState SettingsDb
   -> AcidState NotifHistoryDb
   -> DiscordHandler ()
-onBotStarted settingsDb notifHistoryDb = do
+onBotStarted settingsDb notifDb = do
   echo "Bot started."
   void . forkIO $ do
     sleep 5 -- This may help waiting till the bot is ready
     echo "Starting notifiers."
-    watch getNextNewCommunityPost onNewCommunityPost settingsDb notifHistoryDb
-    watch getNextNewSecretBase onNewSecretBase settingsDb notifHistoryDb
+    watch getNextNewCommunityPost onNewCommunityPost settingsDb notifDb
+    watch getNextNewSecretBase onNewSecretBase settingsDb notifDb
+    watch getNextNewLivestream onNewYTStream settingsDb notifDb
 
 watch ::
   (AcidState NotifHistoryDb -> DiscordHandler a)

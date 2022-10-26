@@ -1,8 +1,8 @@
 {-# LANGUAGE DeriveDataTypeable #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
-{-# LANGUAGE TypeFamilies #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE TemplateHaskell    #-}
+{-# LANGUAGE TypeFamilies       #-}
+{-# LANGUAGE LambdaCase         #-}
 
 module DiscordBot.Guilds.Settings
   ( GuildSettings (..)
@@ -21,7 +21,6 @@ import Utils (tap)
 -- Downloaded libraries
 import Data.SafeCopy (deriveSafeCopy, base)
 import Discord.Types (Snowflake (unSnowflake), DiscordId (unId))
-
 import Data.Acid
   ( Update
   , Query
@@ -34,7 +33,6 @@ import Data.Acid
 
 -- Base
 import Control.Exception (handle)
-
 import qualified Data.Map.Lazy as Map
 
 -------------------------------------------------------------------------------
@@ -47,6 +45,7 @@ data GuildSettings = GuildSettings
   , communityPostRole :: Maybe Word64
   , secretBaseRole    :: Maybe Word64
   , modRole           :: Maybe Word64
+  , relayCh           :: Maybe Word64
   }
 $(deriveSafeCopy 0 'base ''GuildSettings)
 
@@ -68,7 +67,7 @@ upsert guildId new = put . setByGuildId guildId new =<< get
 
 byGuildId :: Word64 -> SettingsDb -> GuildSettings
 byGuildId guildId (SettingsDb allS) =
-  fromMaybe (GuildSettings Nothing Nothing Nothing Nothing Nothing)
+  fromMaybe (GuildSettings Nothing Nothing Nothing Nothing Nothing Nothing)
     $ Map.lookup guildId allS
 
 unSettingsDb :: SettingsDb -> Map Word64 GuildSettings

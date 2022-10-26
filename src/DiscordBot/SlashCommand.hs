@@ -1,7 +1,7 @@
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE ViewPatterns #-}
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NamedFieldPuns        #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE ViewPatterns          #-}
+{-# LANGUAGE LambdaCase            #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 
 module DiscordBot.SlashCommand
@@ -29,7 +29,6 @@ import DiscordBot.Guilds.Settings (SettingsDb, GuildSettings, changeSettings, w6
 -- Downloaded libraries
 import Discord   (DiscordHandler)
 import Data.Acid (AcidState)
-
 import Discord.Types
   ( GuildMember
   , InteractionId
@@ -141,12 +140,12 @@ getChOpt :: Text -> Maybe OptionsData -> DiscordHandler (Maybe ChannelId)
 getChOpt = getOpt toCh where
   toCh (OptionDataValueChannel _ cId) = Just cId
   toCh _                              = Nothing
-  
+
 getRoleOpt :: Text -> Maybe OptionsData -> DiscordHandler (Maybe RoleId)
 getRoleOpt = getOpt toRole where
   toRole (OptionDataValueRole _ rId) = Just rId
   toRole _                           = Nothing
-  
+
 getOpt :: (OptionDataValue -> Maybe a) -> Text -> Maybe OptionsData -> DiscordHandler (Maybe a)
 getOpt toA name (opt name toA -> a) = pure a
 
