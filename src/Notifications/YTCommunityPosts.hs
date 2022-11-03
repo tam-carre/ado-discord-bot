@@ -87,7 +87,7 @@ latestCommunityPost db = do
 -- | Assesses a YouTube English-language relative datestring e.g. "1 hour ago"
 isToday :: Text -> Bool
 isToday date' =
-  all (\unit -> not $ unit `isInfixOf` date') ["day", "week", "month", "year"]
+  all (\unit -> not $ unit `isInfixOf` date') ["day", "week", "month", "year", "hour"]
 
 -- | Takes the page source, returns only the embedded JSON as ByteString
 getPayload :: Text -> Maybe L8.ByteString
