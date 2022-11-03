@@ -70,7 +70,7 @@ latestCommunityPost db = do
 
           else err "Found recent post already notified"
 
-        else err "Found post but it's older than a day"
+        else err "Found post but it's older than an hour"
 
       Just (extractData -> Left e) -> err $ "Failed to extract: " <> show e
       _                            -> err "Found JSON but failed to decode"
