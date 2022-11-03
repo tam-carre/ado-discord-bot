@@ -21,9 +21,9 @@ fetchJson context parser request = do
   let json :: Either JSONException Value
       json   = getResponseBody resp
       status = getResponseStatusCode resp
-      err = pure . Left . (("[" <> context <> "] ") <>)
+      err    = pure . Left . (("[" <> context <> "] ") <>)
 
   case (status, json) of
     (200, Right value) -> pure $ parser value
-    (200, _) -> err "Failed to decode JSON"
-    (code, resp') -> err (show code <> ": " <> show resp')
+    (200, _)           -> err "Failed to decode JSON"
+    (code, resp')      -> err (show code <> ": " <> show resp')

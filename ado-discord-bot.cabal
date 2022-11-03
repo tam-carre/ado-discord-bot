@@ -12,7 +12,7 @@ bug-reports:    https://github.com/tam-carre/ado-discord-bot/issues
 author:         Tam CARRE
 maintainer:     Tam CARRE
 copyright:      2022 Tam CARRE
-license:        BSD3
+license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:

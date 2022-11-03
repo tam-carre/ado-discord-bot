@@ -30,6 +30,7 @@ import Data.Acid
 import Control.Exception (handle)
 
 -------------------------------------------------------------------------------
+
 data NotifHistoryDb = NotifHistoryDb
   { community  :: [Text]
   , secretBase :: [Text]

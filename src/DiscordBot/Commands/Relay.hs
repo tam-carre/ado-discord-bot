@@ -10,5 +10,5 @@ import DiscordBot.SlashCommand    (notificationChCmd, SlashCommand)
 
 relayCmd :: SlashCommand
 relayCmd = notificationChCmd "relay"
-  "YouTube livechat TL and Ado's own messages"
+  "YouTube livechat TL and Ado's own message"
   (\newVal opts -> opts { relayCh = newVal })
