@@ -63,7 +63,7 @@ processMsg db line = do
       | isAdo msg -> do
         echo "Found message by Ado, relaying"
         tl <- rightToMaybe <$> translate msg.content
-        forM_ channelsAwaitingMsg $ send' $ adoMsg msg.content tl
+        forM_ channelsAwaitingMsg $ send' $ adoMsg msg tl
         done
 
       | isTl msg.content -> do
@@ -82,9 +82,9 @@ processMsg db line = do
 isAdo :: Msg -> Bool
 isAdo msg = msg.chId == "UCln9P4Qm3-EAY4aiEPmRwEA"
 
-adoMsg :: Text -> Maybe Text -> Text
-adoMsg txt tl =
-  "<:AdoHappy:885833189086593024> " <> txt
+adoMsg :: Msg -> Maybe Text -> Text
+adoMsg msg tl =
+  "<:AdoHappy:885833189086593024> **" <> msg.name <> "**: " <> msg.content
    <> maybe "" (\t -> "\n*[DeepL] " <> t <> "*") tl
 
 tlMsg :: Text -> Text -> Text
