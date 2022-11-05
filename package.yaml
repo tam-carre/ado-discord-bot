@@ -1,0 +1,71 @@
+name:                ado-discord-bot
+version:             0.1.0.0
+github:              "tam-carre/ado-discord-bot"
+license:             BSD3
+author:              "Tam CARRE"
+maintainer:          "Tam CARRE"
+copyright:           "2022 Tam CARRE"
+
+extra-source-files:
+- README.md
+
+description:         Please see the README on GitHub at <https://github.com/tam-carre/ado-discord-bot#readme>
+
+dependencies:
+- base-noprelude
+- relude
+- hspec
+- hspec-contrib
+- discord-haskell
+- emoji
+- acid-state
+- safecopy
+- unliftio
+- servant
+- servant-client
+- http-client
+- aeson
+- http-conduit
+- bytestring
+- text
+- vector
+- containers
+- process
+- process-streaming
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+
+executables:
+  ado-discord-bot-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ado-discord-bot
+
+tests:
+  ado-discord-bot-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - ado-discord-bot
+

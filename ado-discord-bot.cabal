@@ -1,6 +1,6 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.34.5.
+-- This file has been generated from package.yaml by hpack version 0.35.0.
 --
 -- see: https://github.com/sol/hpack
 
@@ -12,7 +12,7 @@ bug-reports:    https://github.com/tam-carre/ado-discord-bot/issues
 author:         Tam CARRE
 maintainer:     Tam CARRE
 copyright:      2022 Tam CARRE
-license:        MIT
+license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
