@@ -32,6 +32,9 @@ dependencies:
 - containers
 - process
 - process-streaming
+- lens
+- lens-aeson
+- mtl
 
 ghc-options:
 - -Wall

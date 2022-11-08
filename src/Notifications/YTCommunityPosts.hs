@@ -101,7 +101,7 @@ extractData ytData = do
     ?. "twoColumnBrowseResultsRenderer"
     ?. "tabs"
    >>= unArr
-  
+
   communityTab <-
     case
       Vector.find

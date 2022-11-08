@@ -26,6 +26,7 @@ library
   exposed-modules:
       BotConfig
       Deepl
+      Deepl.Internal
       DiscordBot.Commands
       DiscordBot.Commands.Community
       DiscordBot.Commands.CommunityRole
@@ -50,9 +51,11 @@ library
       Network
       Notifications.History
       Notifications.SecretBase
+      Notifications.SecretBase.Internal
       Notifications.Utils
       Notifications.YTCommunityPosts
       Notifications.YTLivestream
+      Notifications.YTLivestream.Internal
       Prelude
       Tokens
       Utils
@@ -73,6 +76,9 @@ library
     , hspec-contrib
     , http-client
     , http-conduit
+    , lens
+    , lens-aeson
+    , mtl
     , process
     , process-streaming
     , relude
@@ -104,6 +110,9 @@ executable ado-discord-bot-exe
     , hspec-contrib
     , http-client
     , http-conduit
+    , lens
+    , lens-aeson
+    , mtl
     , process
     , process-streaming
     , relude
@@ -119,6 +128,9 @@ test-suite ado-discord-bot-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      DeeplSpec
+      NotificationsSecretBaseSpec
+      NotificationsYTLivestreamSpec
       Paths_ado_discord_bot
   hs-source-dirs:
       test
@@ -136,6 +148,9 @@ test-suite ado-discord-bot-test
     , hspec-contrib
     , http-client
     , http-conduit
+    , lens
+    , lens-aeson
+    , mtl
     , process
     , process-streaming
     , relude

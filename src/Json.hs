@@ -1,13 +1,19 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Json ((?.), (?!!), unObj, unArr, unStr) where
+module Json ((?.), (?!!), unObj, unArr, unStr, (.->)) where
 
 -- Downloaded libraries
-import Data.Vector ((!?))
-import Data.Aeson  (Value (..), Key, Object, Array)
+import Data.Vector      ((!?))
+import Data.Aeson       (Value (..), Key, Object, Array, FromJSON, (.:))
+import Data.Aeson.Types (Parser)
 import qualified Data.Aeson.KeyMap as KM
 
 -------------------------------------------------------------------------------
+
+(.->) :: FromJSON a => Parser Object -> Key -> Parser a
+(.->) parser key = do
+  obj <- parser
+  obj .: key
 
 -- | Safely accessing a JSON object property (Optional Chaining)
 (?.) :: Either Text Value -> Key -> Either Text Value

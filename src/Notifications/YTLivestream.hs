@@ -1,13 +1,13 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE ViewPatterns        #-}
+{-# LANGUAGE TypeApplications    #-}
 
 module Notifications.YTLivestream (VideoId, getNextNewLivestream) where
 
 -- Ado Bot modules
-import Json                ((?.), (?!!), unStr)
-import Utils               (betweenSubstrs)
-import Notifications.Utils (returnWhenFound)
+import Notifications.YTLivestream.Internal (VideoIdExtraction (..))
+import Utils                               (betweenSubstrs)
+import Notifications.Utils                 (returnWhenFound)
 import Notifications.History
   ( NotifHistoryDb (..)
   , getNotifHistory
@@ -16,7 +16,7 @@ import Notifications.History
 
 -- Downloaded libraries
 import Data.Acid  (AcidState)
-import Data.Aeson (Value (..), decode)
+import Data.Aeson (eitherDecode)
 import Network.HTTP.Simple
   ( parseRequest
   , getResponseStatusCode
@@ -47,8 +47,8 @@ newLivestream db = do
 
   case (status, jsonStr) of
     (200, Just payload) ->
-      case decode payload :: Maybe Value of
-        Just (extract -> Right vidId) -> do
+      case eitherDecode @VideoIdExtraction payload of
+        Right (VideoId vidId) -> do
           notifHistory <- getNotifHistory db
           if vidId `notElem` notifHistory.ytStream then do
             changeNotifHistory db
@@ -58,9 +58,8 @@ newLivestream db = do
 
           else err "Found livestream already notified"
 
-        Just (extract -> Left NotLive) -> err "Found stream but not live yet"
-        Just (extract -> Left e)       -> err $ "Failed to extract: " <> show e
-        _                              -> err "Found JSON but failed to decode"
+        Right NotLive -> err "Found stream but not live yet"
+        Left e        -> err $ "Failed to extract: " <> show e
 
     (200, Nothing) -> err "No ongoing live"
     _              -> err "Non-200 status code"
@@ -73,20 +72,3 @@ newLivestream db = do
 getPayload :: Text -> Maybe L8.ByteString
 getPayload = fmap (Lazy.Encoding.encodeUtf8 . fromStrict)
   . betweenSubstrs "[{\"videoRenderer\":" "}]}}],\"trackingParams\""
-
-data LivestreamExtractionError = NotLive | OtherError Text deriving (Show)
-
-extract :: Value -> Either LivestreamExtractionError Text
-extract ytData = do
-  videoId <- pure ytData ?. "videoId" >>= unStr & first OtherError
-
-  let isLive =
-        pure ytData
-          ?. "thumbnailOverlays" ?!! 0
-          ?. "thumbnailOverlayTimeStatusRenderer"
-          ?. "style"
-          >>= unStr
-
-  case isLive of
-    Right "LIVE" -> pure videoId
-    _            -> Left NotLive
