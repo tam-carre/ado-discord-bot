@@ -96,10 +96,22 @@ getPayload = fmap (Lazy.Encoding.encodeUtf8 . fromStrict)
 
 extractData :: Value -> Either Text CommunityPost
 extractData ytData = do
-  latestPost <- pure ytData
+  tabs <- pure ytData
     ?. "contents"
     ?. "twoColumnBrowseResultsRenderer"
-    ?. "tabs" ?!! 3
+    ?. "tabs"
+   >>= unArr
+  
+  communityTab <-
+    case
+      Vector.find
+        (\t -> pure t ?. "tabRenderer" ?. "title" == Right "Community")
+        tabs
+    of
+      Nothing -> Left $ "Could not find community tab in "<> show tabs
+      Just t  -> Right t
+
+  latestPost <- pure communityTab
     ?. "tabRenderer"
     ?. "content"
     ?. "sectionListRenderer"
