@@ -9,17 +9,14 @@ module Notifications.YTCommunityPosts
 
 -- Ado Bot modules
 import Lenses
+import App                                     (App)
+import App.Types                               (Db (..))
 import Notifications.YTCommunityPosts.Internal (CommunityPost (..))
 import Utils                                   (betweenSubstrs)
 import Notifications.Utils                     (returnWhenFound)
-import Notifications.History
-  ( NotifHistoryDb (..)
-  , getNotifHistory
-  , changeNotifHistory
-  )
+import Notifications.History                   (getNotifHistory , changeNotifHistory)
 
 -- Downloaded libraries
-import Data.Acid  (AcidState)
 import Data.Text  (isInfixOf)
 import Data.Aeson (eitherDecode)
 import Network.HTTP.Simple
@@ -35,13 +32,13 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 -------------------------------------------------------------------------------
 
 -- | This function only returns once Ado uploads a fresh new community post
-getNextNewCommunityPost :: MonadIO m => AcidState NotifHistoryDb -> m CommunityPost
+getNextNewCommunityPost :: App CommunityPost
 getNextNewCommunityPost = returnWhenFound latestCommunityPost "New community post"
 
 -- | Returns a freshly uploaded community post by Ado, or a Left explaining
 -- what problem it encountered.
-latestCommunityPost :: MonadIO m => AcidState NotifHistoryDb -> m (Either Text CommunityPost)
-latestCommunityPost db = do
+latestCommunityPost :: App (Either Text CommunityPost)
+latestCommunityPost = do
   request <- liftIO $ get' "https://www.youtube.com/c/Ado1024/community"
   response <- httpBS . eng $ request
 
@@ -52,6 +49,7 @@ latestCommunityPost db = do
     (200, Just payload) -> case eitherDecode @CommunityPost payload of
       Right post@(CommunityPost { _postId, _date }) ->
         if isToday _date then do
+          db <- asks _notifDb
           notifHistory <- getNotifHistory db
           if _postId `notElem` (notifHistory^.community) then do
             changeNotifHistory db . over community $ \h -> _postId : take 50 h

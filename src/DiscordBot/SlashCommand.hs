@@ -23,6 +23,8 @@ module DiscordBot.SlashCommand
   ) where
 
 -- Ado Bot modules
+import App                           (App)
+import App.Types                     (Db (..))
 import DiscordBot.SlashCommand.Types (SlashCommand (..), SlashProps (..))
 import DiscordBot.Perms              (PermLvl (..))
 import DiscordBot.SendMessage        (replyEmbed)
@@ -31,7 +33,6 @@ import Lenses hiding (required)
 import qualified Lenses as L
 
 -- Downloaded libraries
-import Discord       (DiscordHandler)
 import Discord.Types (ChannelId, RoleId)
 import Discord.Interactions
   ( createChatInput
@@ -94,27 +95,27 @@ optionRole name' description' =
 requiredOpt :: (Text -> Text -> OptionValue) -> Text -> Text -> OptionValue
 requiredOpt builder name' description' = builder name' description' & L.required .~ True
 
-required :: (Text -> Maybe OptionsData -> DiscordHandler (Maybe a)) -> Text -> Maybe OptionsData -> DiscordHandler a
+required :: (Text -> Maybe OptionsData -> App (Maybe a)) -> Text -> Maybe OptionsData -> App a
 required getter name' opts = getter name' opts <&> \case
   Just a -> a
   Nothing -> error "Asked for required option but it wasn't registered as such."
 
-getStrOpt :: Text -> Maybe OptionsData -> DiscordHandler (Maybe Text)
+getStrOpt :: Text -> Maybe OptionsData -> App (Maybe Text)
 getStrOpt = getOpt toStr where
   toStr (OptionDataValueString _ (Right str)) = Just str
   toStr _                                     = Nothing
 
-getChOpt :: Text -> Maybe OptionsData -> DiscordHandler (Maybe ChannelId)
+getChOpt :: Text -> Maybe OptionsData -> App (Maybe ChannelId)
 getChOpt = getOpt toCh where
   toCh (OptionDataValueChannel _ cId) = Just cId
   toCh _                              = Nothing
 
-getRoleOpt :: Text -> Maybe OptionsData -> DiscordHandler (Maybe RoleId)
+getRoleOpt :: Text -> Maybe OptionsData -> App (Maybe RoleId)
 getRoleOpt = getOpt toRole where
   toRole (OptionDataValueRole _ rId) = Just rId
   toRole _                           = Nothing
 
-getOpt :: (OptionDataValue -> Maybe a) -> Text -> Maybe OptionsData -> DiscordHandler (Maybe a)
+getOpt :: (OptionDataValue -> Maybe a) -> Text -> Maybe OptionsData -> App (Maybe a)
 getOpt toA name' (opt name' toA -> a) = pure a
 
 opt :: Text -> (OptionDataValue -> Maybe a) -> Maybe OptionsData -> Maybe a
@@ -136,9 +137,10 @@ notificationChCmd name' thingToNotify setter = slash $ SlashProps
       [ optionCh "channel" $
           "The channel (if any) in which to send " <> thingToNotify <> " notifications"
       ]
-  , _handler = \db intr _mem gid' opts -> do
+  , _handler = \intr _mem gid' opts -> do
       chanId <- getChOpt "channel" opts
 
+      db <- asks _settingsDb
       changeSettings db gid' $ setter (w64 <$> chanId)
 
       replyEmbed intr $ case chanId of
@@ -154,9 +156,10 @@ roleCmd name' purpose isRequired setter = slash $ SlashProps
   , _options =
       [ maybeRequired isRequired optionRole "role" $ "The role which " <> purpose
       ]
-  , _handler = \db intr _mem gid' opts -> do
+  , _handler = \intr _mem gid' opts -> do
       roleId <- getRoleOpt "role" opts
 
+      db <- asks _settingsDb
       changeSettings db gid' $ setter (w64 <$> roleId)
 
       replyEmbed intr $ case roleId of

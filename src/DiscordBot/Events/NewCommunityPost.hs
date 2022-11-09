@@ -5,20 +5,17 @@ module DiscordBot.Events.NewCommunityPost (onNewCommunityPost) where
 
 -- Ado Bot modules
 import Lenses
+import App                            (App)
 import Deepl                          (translate)
 import DiscordBot.Events.Notify       (notify, Notif (..))
-import DiscordBot.Guilds.Settings     (SettingsDb, GuildSettings (..))
+import DiscordBot.Guilds.Settings     (GuildSettings (..))
 import Notifications.YTCommunityPosts (CommunityPost (..))
-
--- Downloaded libraries
-import Discord   (DiscordHandler)
-import Data.Acid (AcidState)
 
 -------------------------------------------------------------------------------
 
-onNewCommunityPost :: AcidState SettingsDb -> CommunityPost -> DiscordHandler ()
-onNewCommunityPost db post = do
-  notify db Notif
+onNewCommunityPost :: CommunityPost -> App ()
+onNewCommunityPost post = do
+  notify Notif
     { _settingsToCh   = _communityPostCh
     , _settingsToRole = _communityPostRole
     , _nThumb         = Just $ post^.avatar
@@ -31,7 +28,7 @@ onNewCommunityPost db post = do
 
   post^.content & translate >>= \case
     Left err -> echo err
-    Right tl -> notify db Notif
+    Right tl -> notify Notif
       { _settingsToCh   = _communityPostCh
       , _settingsToRole = const Nothing
       , _nThumb         = Nothing

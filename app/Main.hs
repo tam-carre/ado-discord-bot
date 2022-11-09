@@ -12,6 +12,7 @@ import Notifications.History        (getNotifHistoryDb)
 
 -- Downloaded libraries
 import Discord (runDiscord, def)
+import App.Types (Db(Db))
 
 ------------------------------------------------------------------------------
 
@@ -19,13 +20,12 @@ main :: IO ()
 main = do
   echo "Application started."
 
-  notifHistoryDb <- getNotifHistoryDb
-  settingsDb     <- getSettingsDb
+  db <- Db <$> getNotifHistoryDb <*> getSettingsDb
 
-  botTerminationError <- runDiscord $ def
-    & token         .~ botConfig^.botToken
-    & onEvent       .~ onDiscordEvent settingsDb
-    & onStart       .~ onBotStarted settingsDb notifHistoryDb
-    & gatewayIntent .~ (def & messageContent .~ False)
+  botTerminationError <-
+    runDiscord $ def & token   .~ botConfig^.botToken
+                     & onEvent .~ usingReaderT db . onDiscordEvent
+                     & onStart .~ runReaderT onBotStarted db
+                     & gatewayIntent .~ (def & messageContent .~ False)
 
   echo $ "A fatal error occurred: " <> botTerminationError

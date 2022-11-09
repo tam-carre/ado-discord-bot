@@ -9,31 +9,27 @@ module Notifications.SecretBase
 
 -- Ado Bot modules
 import Lenses
+import App                               (App)
+import App.Types                         (Db (..))
 import Notifications.SecretBase.Internal (Lives (..), SecretBaseLive (..))
-import Network                           (fetchJson')
+import Network                           (fetchJson)
 import Utils                             ((>>>=))
 import Notifications.Utils               (returnWhenFound)
-import Notifications.History
-  ( NotifHistoryDb (..)
-  , getNotifHistory
-  , changeNotifHistory
-  )
-
--- Downloaded libraries
-import Data.Acid (AcidState)
+import Notifications.History             (getNotifHistory, changeNotifHistory)
 
 -------------------------------------------------------------------------------
 
 -- | This function only returns once Ado goes live on Secret Base
-getNextNewSecretBase :: MonadIO m => AcidState NotifHistoryDb -> m SecretBaseLive
+getNextNewSecretBase :: App SecretBaseLive
 getNextNewSecretBase = returnWhenFound latestSecretBase "New Secret Base"
 
 -- | Returns a freshly started Secret Base stream by Ado, or a Left explaining
 -- what problem it encountered.
-latestSecretBase :: MonadIO m => AcidState NotifHistoryDb -> m (Either Text SecretBaseLive)
-latestSecretBase db = fetchJson' @Lives endpoint >>>= \case
+latestSecretBase :: App (Either Text SecretBaseLive)
+latestSecretBase = fetchJson @Lives endpoint >>>= \case
   Lives [] -> err "No ongoing live"
   Lives lives -> do
+    db <- asks _notifDb
     notifHistory <- getNotifHistory db
     let new = filter ((`notElem` (notifHistory^.secretBase)) . sblUrl) lives
     case listToMaybe new of

@@ -3,12 +3,10 @@
 module DiscordBot.SlashCommand.Types (SlashCommand (..), SlashProps (..)) where
 
 -- Ado Bot modules
-import DiscordBot.Perms.Types     (PermLvl (..))
-import DiscordBot.Guilds.Settings (SettingsDb)
+import App                    (App)
+import DiscordBot.Perms.Types (PermLvl (..))
 
 -- Downloaded libraries
-import Discord       (DiscordHandler)
-import Data.Acid     (AcidState)
 import Discord.Types (GuildMember, InteractionId, InteractionToken, GuildId)
 import Discord.Interactions
   ( CreateApplicationCommand (..)
@@ -23,12 +21,11 @@ data SlashCommand = SlashCommand
   , _desc         :: Text
   , _permLvl      :: PermLvl
   , _options      :: [OptionValue]
-  , _handler      :: AcidState SettingsDb
-                  -> (InteractionId, InteractionToken)
+  , _handler      :: (InteractionId, InteractionToken)
                   -> GuildMember
                   -> GuildId
                   -> Maybe OptionsData
-                  -> DiscordHandler ()
+                  -> App ()
   , _registration :: Maybe CreateApplicationCommand
   }
 
@@ -37,11 +34,10 @@ data SlashProps = SlashProps
   , _desc    :: Text
   , _permLvl :: PermLvl
   , _options :: [OptionValue]
-  , _handler :: AcidState SettingsDb
-             -> (InteractionId, InteractionToken)
+  , _handler :: (InteractionId, InteractionToken)
              -> GuildMember
              -> GuildId
              -> Maybe OptionsData
-             -> DiscordHandler ()
+             -> App ()
   }
 

@@ -7,7 +7,7 @@ module Deepl (translate) where
 import Lenses
 import Deepl.Internal (Tl (..))
 import BotConfig      (botConfig)
-import Network        (fetchJson')
+import Network        (fetchJson)
 import Utils          ((<&>>=))
 
 -- Downloaded libraries
@@ -17,7 +17,7 @@ import Network.HTTP.Simple (setRequestHeader, setRequestBodyURLEncoded, Request)
 
 translate :: MonadIO m => Text -> m (Either Text Text)
 translate txt =
-  fetchJson' req
+  fetchJson req
     <&>>= \(Tl { srcLang, tlTxt }) -> case srcLang of
       "EN" -> Left "[DeepL] Source text was already English"
       _    -> Right tlTxt

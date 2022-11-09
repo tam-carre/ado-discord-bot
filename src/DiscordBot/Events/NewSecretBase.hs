@@ -4,18 +4,15 @@ module DiscordBot.Events.NewSecretBase (onNewSecretBase) where
 
 -- Ado Bot modules
 import Lenses
+import App                        (App)
 import DiscordBot.Events.Notify   (notify, Notif (..))
-import DiscordBot.Guilds.Settings (SettingsDb, GuildSettings (..))
+import DiscordBot.Guilds.Settings (GuildSettings (..))
 import Notifications.SecretBase   (SecretBaseLive (..))
-
--- Downloaded libraries
-import Discord   (DiscordHandler)
-import Data.Acid (AcidState)
 
 -------------------------------------------------------------------------------
 
-onNewSecretBase :: AcidState SettingsDb -> SecretBaseLive -> DiscordHandler ()
-onNewSecretBase settingsDb live = notify settingsDb Notif
+onNewSecretBase :: SecretBaseLive -> App ()
+onNewSecretBase live = notify Notif
   { _settingsToCh   = _secretBaseCh
   , _settingsToRole = _secretBaseRole
   , _nThumb         = Just $ live^.thumb

@@ -18,9 +18,8 @@
 module DiscordBot.Events.BotStarted (onBotStarted) where
 
 -- Ado Bot modules
-import Notifications.History              (NotifHistoryDb)
+import App                                (App)
 import Utils                              (sleep)
-import DiscordBot.Guilds.Settings         (SettingsDb)
 import DiscordBot.Events.NewCommunityPost (onNewCommunityPost)
 import DiscordBot.Events.NewSecretBase    (onNewSecretBase)
 import DiscordBot.Events.NewYTStream      (onNewYTStream)
@@ -28,35 +27,25 @@ import Notifications.YTCommunityPosts     (getNextNewCommunityPost)
 import Notifications.SecretBase           (getNextNewSecretBase)
 
 -- Downloaded libraries
-import Discord             (DiscordHandler)
-import Data.Acid           (AcidState)
 import UnliftIO.Concurrent (forkIO)
 import Notifications.YTLivestream (getNextNewLivestream)
 
 -------------------------------------------------------------------------------
 
 -- | Good to know: This handler blocks bot execution until it returns.
-onBotStarted ::
-  AcidState SettingsDb
-  -> AcidState NotifHistoryDb
-  -> DiscordHandler ()
-onBotStarted settingsDb notifDb = do
+onBotStarted :: App ()
+onBotStarted = do
   echo "Bot started."
   void . forkIO $ do
     sleep 5 -- This may help waiting till the bot is ready
     echo "Starting notifiers."
-    watch getNextNewCommunityPost onNewCommunityPost settingsDb notifDb
-    watch getNextNewSecretBase onNewSecretBase settingsDb notifDb
-    watch getNextNewLivestream onNewYTStream settingsDb notifDb
+    watch getNextNewCommunityPost onNewCommunityPost
+    watch getNextNewSecretBase onNewSecretBase
+    watch getNextNewLivestream onNewYTStream
 
-watch ::
-  (AcidState NotifHistoryDb -> DiscordHandler a)
-  -> (AcidState SettingsDb -> a -> DiscordHandler ())
-  -> AcidState SettingsDb
-  -> AcidState NotifHistoryDb
-  -> DiscordHandler ()
-watch watcher handler settingsDb notifHistoryDb = void . forkIO $ do
-  justCameOut <- watcher notifHistoryDb
-  void . forkIO $ handler settingsDb justCameOut
+watch :: App a -> (a -> App ()) -> App ()
+watch watcher handler = void . forkIO $ do
+  justCameOut <- watcher
+  void . forkIO $ handler justCameOut
   sleep 30
-  watch watcher handler settingsDb notifHistoryDb
+  watch watcher handler

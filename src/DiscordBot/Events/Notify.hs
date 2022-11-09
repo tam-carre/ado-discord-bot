@@ -5,23 +5,23 @@ module DiscordBot.Events.Notify (notify, Notif (..)) where
 
 -- Ado Bot modules
 import Lenses
+import App                            (App)
+import App.Types                      (Db (..))
 import Utils                          (decorate)
 import DiscordBot.Events.Notify.Types (Notif (..))
 import DiscordBot.SendMessage         (sendWithEmbed', embed)
-import DiscordBot.Guilds.Settings     (SettingsDb, getAllSettings)
+import DiscordBot.Guilds.Settings     (getAllSettings)
 
 -- Downloaded libraries
-import Data.Acid     (AcidState)
-import Discord       (DiscordHandler)
 import Discord.Types (CreateEmbedImage (..))
 import qualified Data.Map  as Map
 import qualified Data.Text as T
 
 -------------------------------------------------------------------------------
 
-notify :: AcidState SettingsDb -> Notif -> DiscordHandler ()
-notify db n = do
-  allSettings     <- getAllSettings db
+notify :: Notif -> App ()
+notify n = do
+  allSettings     <- getAllSettings =<< asks _settingsDb
   let chAndRole gs = (n^.settingsToCh) gs <&> (, (n^.settingsToRole) gs)
       pendingMsgs  = mapMaybe chAndRole $ Map.elems allSettings
       avvie        = CreateEmbedImageUrl <$> n^.nThumb

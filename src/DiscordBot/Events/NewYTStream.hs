@@ -6,22 +6,21 @@ module DiscordBot.Events.NewYTStream (onNewYTStream) where
 import DiscordBot.Events.NewYTChatMsg (onNewYTChatMsg)
 import DiscordBot.Events.Notify       (notify, Notif (..))
 import Notifications.YTLivestream     (VideoId)
-import DiscordBot.Guilds.Settings     (SettingsDb, GuildSettings (..))
+import DiscordBot.Guilds.Settings     (GuildSettings (..))
 
 -- Downloaded libraries
-import Discord                  (DiscordHandler)
-import Data.Acid                (AcidState)
 import System.Process           (shell)
 import System.Process.Streaming (execute, piped, foldOutErr)
 import qualified System.Process.Streaming.Text as PT
+import App (App)
 
 -------------------------------------------------------------------------------
 
-onNewYTStream :: AcidState SettingsDb -> VideoId -> DiscordHandler ()
-onNewYTStream db vidId = do
+onNewYTStream :: VideoId -> App ()
+onNewYTStream vidId = do
   let url = "https://youtu.be/" <> vidId
 
-  notify db Notif
+  notify Notif
     { _settingsToCh   = _relayCh
     , _settingsToRole = const Nothing
     , _nThumb         = Nothing
@@ -31,8 +30,10 @@ onNewYTStream db vidId = do
     , _msgTxt         = Nothing
     }
 
-  discordHandle <- ask
-  let onMsgIO line = runReaderT (onNewYTChatMsg db line) discordHandle
+  db <- ask
+  discordHandle <- lift ask
+  let onMsgDiscord line = runReaderT (onNewYTChatMsg line) db
+      onMsgIO      line = runReaderT (onMsgDiscord line)   discordHandle
 
   liftIO $ execute
     (piped . shell $ "node ./masterchat/index.js " <> toString vidId)

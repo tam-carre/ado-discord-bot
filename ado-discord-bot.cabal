@@ -24,6 +24,8 @@ source-repository head
 
 library
   exposed-modules:
+      App
+      App.Types
       BotConfig
       Deepl
       Deepl.Internal

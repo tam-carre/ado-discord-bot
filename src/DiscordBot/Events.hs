@@ -3,14 +3,12 @@
 module DiscordBot.Events (onDiscordEvent) where
 
 -- Ado Bot modules
-import DiscordBot.Guilds.Settings                     (SettingsDb)
+import App                                            (App)
 import DiscordBot.Events.DiscordAPI.Ready             (onReady)
 import DiscordBot.Events.DiscordAPI.InteractionCreate (onInteractionCreate)
 
 -- Downloaded libraries
-import Discord       (DiscordHandler)
 import Discord.Types (Event (..), PartialApplication (..))
-import Data.Acid     (AcidState)
 
 -------------------------------------------------------------------------------
 
@@ -21,8 +19,8 @@ import Data.Acid     (AcidState)
 --     <https://discord.com/developers/docs/topics/gateway-events#receive-events>
 --     Parameters in discord-haskell are in the same order as in the above
 --     documentation.
-onDiscordEvent :: AcidState SettingsDb -> Event -> DiscordHandler ()
-onDiscordEvent db = \case
+onDiscordEvent :: Event -> App ()
+onDiscordEvent = \case
   Ready _ _ _ _ _ _ (PartialApplication appId _) -> onReady appId
-  InteractionCreate intr                         -> onInteractionCreate db intr
+  InteractionCreate intr                         -> onInteractionCreate intr
   _                                              -> pass

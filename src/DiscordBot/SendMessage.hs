@@ -12,9 +12,10 @@ module DiscordBot.SendMessage
 
 -- Ado Bot modules
 import Lenses
+import App    (App)
 
 -- Downloaded libraries
-import Discord (DiscordHandler, restCall, def)
+import Discord (restCall, def)
 import Discord.Types
   ( InteractionId
   , InteractionToken
@@ -33,10 +34,10 @@ import qualified Discord.Requests as R
 
 -------------------------------------------------------------------------------
 
-reply :: (InteractionId, InteractionToken) -> Text -> DiscordHandler ()
+reply :: (InteractionId, InteractionToken) -> Text -> App ()
 reply (iId, iToken) = resp iId iToken . interactionResponseBasic
 
-replyEmbed :: (InteractionId, InteractionToken) -> Text -> DiscordHandler ()
+replyEmbed :: (InteractionId, InteractionToken) -> Text -> App ()
 replyEmbed (iId, iToken) msg =
     resp iId iToken
   . InteractionResponseChannelMessage
@@ -59,23 +60,23 @@ intrRespMsg =
     Nothing
     Nothing
 
-resp :: InteractionId -> InteractionToken -> InteractionResponse -> DiscordHandler ()
-resp iId iToken = void . restCall . R.CreateInteractionResponse iId iToken
+resp :: InteractionId -> InteractionToken -> InteractionResponse -> App ()
+resp iId iToken = lift . void . restCall . R.CreateInteractionResponse iId iToken
 
-send :: Text -> ChannelId -> DiscordHandler ()
-send content' cid = void . restCall $ R.CreateMessage cid content'
+send :: Text -> ChannelId -> App ()
+send content' cid = lift . void . restCall $ R.CreateMessage cid content'
 
 -- | like `send` but accepts an unwrapped Word64
-send' :: Text -> Word64 -> DiscordHandler ()
+send' :: Text -> Word64 -> App ()
 send' content' = send content' . DiscordId . Snowflake
 
-sendWithEmbed :: ChannelId -> Text -> CreateEmbed -> DiscordHandler ()
+sendWithEmbed :: ChannelId -> Text -> CreateEmbed -> App ()
 sendWithEmbed cid txt emb = do
-  result <- restCall . R.CreateMessageDetailed cid $ def & content .~ txt
-                                                         & embeds  ?~ [emb]
+  result <- lift . restCall . R.CreateMessageDetailed cid $ def & content .~ txt
+                                                                & embeds  ?~ [emb]
   if isLeft result
     then print result
     else pass
 
-sendWithEmbed' :: Word64 -> Text -> CreateEmbed -> DiscordHandler ()
+sendWithEmbed' :: Word64 -> Text -> CreateEmbed -> App ()
 sendWithEmbed' = sendWithEmbed . DiscordId . Snowflake

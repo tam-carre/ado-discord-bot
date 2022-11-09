@@ -5,17 +5,14 @@ module Notifications.YTLivestream (VideoId, getNextNewLivestream) where
 
 -- Ado Bot modules
 import Lenses
+import App                                 (App)
+import App.Types                           (Db (..))
 import Notifications.YTLivestream.Internal (VideoIdExtraction (..))
 import Utils                               (betweenSubstrs)
 import Notifications.Utils                 (returnWhenFound)
-import Notifications.History
-  ( NotifHistoryDb (..)
-  , getNotifHistory
-  , changeNotifHistory
-  )
+import Notifications.History               (getNotifHistory, changeNotifHistory)
 
 -- Downloaded libraries
-import Data.Acid  (AcidState)
 import Data.Aeson (eitherDecode)
 import Network.HTTP.Simple
   ( parseRequest
@@ -32,13 +29,13 @@ import qualified Data.ByteString.Lazy.Char8 as L8
 type VideoId = Text
 
 -- | This function only returns once Ado goes live on YouTube
-getNextNewLivestream :: MonadIO m => AcidState NotifHistoryDb -> m VideoId
+getNextNewLivestream :: App VideoId
 getNextNewLivestream = returnWhenFound newLivestream "New livestream"
 
 -- | Returns the video ID of Ado's just-started livestream, or a Left explaining
 -- what problem it encountered.
-newLivestream :: MonadIO m => AcidState NotifHistoryDb -> m (Either Text VideoId)
-newLivestream db = do
+newLivestream :: App (Either Text VideoId)
+newLivestream = do
   request <- liftIO $ parseRequest "GET https://www.youtube.com/c/Ado1024"
   response <- httpBS . setRequestHeader "Accept-Language" ["en"] $ request
 
@@ -49,6 +46,7 @@ newLivestream db = do
     (200, Just payload) ->
       case eitherDecode @VideoIdExtraction payload of
         Right (VideoId vidId) -> do
+          db <- asks _notifDb
           notifHistory <- getNotifHistory db
           if vidId `notElem` (notifHistory^.ytStream) then do
             changeNotifHistory db . over ytStream $ \h -> vidId : take 50 h

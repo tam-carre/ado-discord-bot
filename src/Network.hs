@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Network (fetchJson') where
+module Network (fetchJson) where
 
 -- Downloaded libraries
 import Data.Aeson (FromJSON)
@@ -16,8 +16,8 @@ import Network.HTTP.Simple
 
 -------------------------------------------------------------------------------
 
-fetchJson' :: forall a. forall m. (MonadIO m, FromJSON a) => Request -> m (Either Text a)
-fetchJson' request = do
+fetchJson :: forall a. forall m. (MonadIO m, FromJSON a) => Request -> m (Either Text a)
+fetchJson request = do
   resp <- (httpJSONEither request :: MonadIO m => m (Response (Either JSONException a)))
 
   let jsonEither :: Either JSONException a
