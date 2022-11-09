@@ -5,8 +5,7 @@ module Notifications.YTLivestream (VideoId, getNextNewLivestream) where
 
 -- Ado Bot modules
 import Lenses
-import App                                 (App)
-import App.Types                           (Db (..))
+import App                                 (App, Db (..))
 import Notifications.YTLivestream.Internal (VideoIdExtraction (..))
 import Utils                               (betweenSubstrs)
 import Notifications.Utils                 (returnWhenFound)
@@ -46,7 +45,7 @@ newLivestream = do
     (200, Just payload) ->
       case eitherDecode @VideoIdExtraction payload of
         Right (VideoId vidId) -> do
-          db <- asks _notifDb
+          db <- asks notifDb
           notifHistory <- getNotifHistory db
           if vidId `notElem` (notifHistory^.ytStream) then do
             changeNotifHistory db . over ytStream $ \h -> vidId : take 50 h

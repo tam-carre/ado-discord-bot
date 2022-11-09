@@ -9,8 +9,7 @@ module Notifications.SecretBase
 
 -- Ado Bot modules
 import Lenses
-import App                               (App)
-import App.Types                         (Db (..))
+import App                               (App, Db (..))
 import Notifications.SecretBase.Internal (Lives (..), SecretBaseLive (..))
 import Network                           (fetchJson)
 import Utils                             ((>>>=))
@@ -29,7 +28,7 @@ latestSecretBase :: App (Either Text SecretBaseLive)
 latestSecretBase = fetchJson @Lives endpoint >>>= \case
   Lives [] -> err "No ongoing live"
   Lives lives -> do
-    db <- asks _notifDb
+    db <- asks notifDb
     notifHistory <- getNotifHistory db
     let new = filter ((`notElem` (notifHistory^.secretBase)) . sblUrl) lives
     case listToMaybe new of

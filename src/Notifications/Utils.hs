@@ -3,8 +3,8 @@
 module Notifications.Utils (returnWhenFound) where
 
 -- Ado Bot modules
-import App                   (App)
-import Utils                 (sleep)
+import App   (App)
+import Utils (sleep)
 
 -------------------------------------------------------------------------------
 

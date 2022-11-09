@@ -9,8 +9,7 @@ module Notifications.YTCommunityPosts
 
 -- Ado Bot modules
 import Lenses
-import App                                     (App)
-import App.Types                               (Db (..))
+import App                                     (App, Db (..))
 import Notifications.YTCommunityPosts.Internal (CommunityPost (..))
 import Utils                                   (betweenSubstrs)
 import Notifications.Utils                     (returnWhenFound)
@@ -49,7 +48,7 @@ latestCommunityPost = do
     (200, Just payload) -> case eitherDecode @CommunityPost payload of
       Right post@(CommunityPost { _postId, _date }) ->
         if isToday _date then do
-          db <- asks _notifDb
+          db <- asks notifDb
           notifHistory <- getNotifHistory db
           if _postId `notElem` (notifHistory^.community) then do
             changeNotifHistory db . over community $ \h -> _postId : take 50 h

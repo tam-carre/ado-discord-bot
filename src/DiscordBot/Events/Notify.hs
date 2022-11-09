@@ -5,8 +5,7 @@ module DiscordBot.Events.Notify (notify, Notif (..)) where
 
 -- Ado Bot modules
 import Lenses
-import App                            (App)
-import App.Types                      (Db (..))
+import App                            (App, Db (..))
 import Utils                          (decorate)
 import DiscordBot.Events.Notify.Types (Notif (..))
 import DiscordBot.SendMessage         (sendWithEmbed', embed)
@@ -21,7 +20,7 @@ import qualified Data.Text as T
 
 notify :: Notif -> App ()
 notify n = do
-  allSettings     <- getAllSettings =<< asks _settingsDb
+  allSettings     <- getAllSettings =<< asks settingsDb
   let chAndRole gs = (n^.settingsToCh) gs <&> (, (n^.settingsToRole) gs)
       pendingMsgs  = mapMaybe chAndRole $ Map.elems allSettings
       avvie        = CreateEmbedImageUrl <$> n^.nThumb

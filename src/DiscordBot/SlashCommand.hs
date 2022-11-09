@@ -23,8 +23,7 @@ module DiscordBot.SlashCommand
   ) where
 
 -- Ado Bot modules
-import App                           (App)
-import App.Types                     (Db (..))
+import App                           (App, Db (..))
 import DiscordBot.SlashCommand.Types (SlashCommand (..), SlashProps (..))
 import DiscordBot.Perms              (PermLvl (..))
 import DiscordBot.SendMessage        (replyEmbed)
@@ -140,7 +139,7 @@ notificationChCmd name' thingToNotify setter = slash $ SlashProps
   , _handler = \intr _mem gid' opts -> do
       chanId <- getChOpt "channel" opts
 
-      db <- asks _settingsDb
+      db <- asks settingsDb
       changeSettings db gid' $ setter (w64 <$> chanId)
 
       replyEmbed intr $ case chanId of
@@ -159,7 +158,7 @@ roleCmd name' purpose isRequired setter = slash $ SlashProps
   , _handler = \intr _mem gid' opts -> do
       roleId <- getRoleOpt "role" opts
 
-      db <- asks _settingsDb
+      db <- asks settingsDb
       changeSettings db gid' $ setter (w64 <$> roleId)
 
       replyEmbed intr $ case roleId of

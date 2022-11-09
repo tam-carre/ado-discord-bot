@@ -4,6 +4,7 @@ module Main (main) where
 
 -- Ado Bot modules
 import Lenses
+import App                          (Db (Db))
 import BotConfig                    (botConfig)
 import DiscordBot.Events            (onDiscordEvent)
 import DiscordBot.Events.BotStarted (onBotStarted)
@@ -12,7 +13,6 @@ import Notifications.History        (getNotifHistoryDb)
 
 -- Downloaded libraries
 import Discord (runDiscord, def)
-import App.Types (Db(Db))
 
 ------------------------------------------------------------------------------
 
