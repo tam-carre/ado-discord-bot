@@ -54,6 +54,7 @@ library
       Notifications.SecretBase.Internal
       Notifications.Utils
       Notifications.YTCommunityPosts
+      Notifications.YTCommunityPosts.Internal
       Notifications.YTLivestream
       Notifications.YTLivestream.Internal
       Prelude
@@ -130,6 +131,7 @@ test-suite ado-discord-bot-test
   other-modules:
       DeeplSpec
       NotificationsSecretBaseSpec
+      NotificationsYTCommunityPostsSpec
       NotificationsYTLivestreamSpec
       Paths_ado_discord_bot
   hs-source-dirs:
