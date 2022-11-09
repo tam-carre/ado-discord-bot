@@ -1,10 +1,14 @@
-module Utils (tap, betweenSubstrs, decorate, sleep, (>>>=), (<&>>=)) where
+module Utils where
 
 -- Downloaded libraries
-import Data.Text  (splitOn)
+import Data.Text (splitOn)
+import Language.Haskell.TH
 
 -- Base
+import Control.Lens
 import Control.Concurrent (threadDelay)
+import Data.Char          (toLower, toUpper)
+import Data.List          (stripPrefix)
 
 -------------------------------------------------------------------------------
 
@@ -40,3 +44,20 @@ m1 >>>= f = m1 >>= (fmap join . mapM f)
 -- | e.g. you want to chain the `a`in `IO (Maybe a)` to a `Maybe b`
 (<&>>=) :: (Monad m1, Monad m2) => m1 (m2 a) -> (a -> m2 b) -> m1 (m2 b)
 m1 <&>>= f = m1 <&> (>>= f)
+
+makeFieldsOptionalPrefix :: String -> Name -> DecsQ
+makeFieldsOptionalPrefix pf = makeLensesWith $ lensRules & lensField   .~ namer
+                                                         & createClass .~ True
+  where
+  namer _ _ field = maybeToList $ do
+    let base = nameBase field
+    let fieldPart = fromMaybe base $ stripPrefix pf base
+    method <- computeMethod fieldPart
+    cls <- computeCls fieldPart
+    return (MethodName (mkName cls) (mkName method))
+
+    where
+    computeMethod (x:xs) = Just (toLower x : xs)
+    computeMethod _      = Nothing
+    computeCls (x:xs) = Just ("Has" ++ (toUpper x : xs))
+    computeCls _      = Nothing

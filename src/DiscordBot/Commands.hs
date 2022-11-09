@@ -24,4 +24,4 @@ appCommands =
   ]
 
 cmdByName :: Text -> Maybe SlashCommand
-cmdByName cmdName = find ((==) cmdName  . name) appCommands
+cmdByName cmdName = find ((==) cmdName  . _name) appCommands

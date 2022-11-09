@@ -3,6 +3,7 @@
 module DiscordBot.Events.DiscordAPI.Ready (onReady) where
 
 -- Ado Bot modules
+import Lenses
 import DiscordBot.Commands     (appCommands)
 import DiscordBot.SlashCommand (SlashCommand (..))
 
@@ -30,7 +31,7 @@ tryRegistering ::
   ApplicationId
   -> SlashCommand
   -> DiscordHandler (Either RestCallErrorCode ApplicationCommand)
-tryRegistering appId cmd = case registration cmd of
+tryRegistering appId cmd = case cmd^.registration of
   Just reg -> restCall    $ CreateGlobalApplicationCommand appId reg
   Nothing  -> pure . Left $ RestCallErrorCode 0 "" ""
 
@@ -41,7 +42,5 @@ unregisterOutdatedCmds appId validCmds = do
     Left err -> echo $ "Failed to get registered slash commands: " <> show err
     Right cmds -> do
       let validIds    = map applicationCommandId validCmds
-          outdatedIds = filter (`notElem` validIds)
-                      . map applicationCommandId
-                      $ cmds
+          outdatedIds = filter (`notElem` validIds) (cmds <&> view id)
       mapM_ (restCall . DeleteGlobalApplicationCommand appId) outdatedIds

@@ -3,15 +3,15 @@
 module Main (main) where
 
 -- Ado Bot modules
-import BotConfig                    (botConfig, BotConfig (..))
+import Lenses
+import BotConfig                    (botConfig)
 import DiscordBot.Events            (onDiscordEvent)
 import DiscordBot.Events.BotStarted (onBotStarted)
 import DiscordBot.Guilds.Settings   (getSettingsDb)
 import Notifications.History        (getNotifHistoryDb)
 
 -- Downloaded libraries
-import Discord       (runDiscord, def, RunDiscordOpts (..))
-import Discord.Types (GatewayIntent (..))
+import Discord (runDiscord, def)
 
 ------------------------------------------------------------------------------
 
@@ -23,10 +23,9 @@ main = do
   settingsDb     <- getSettingsDb
 
   botTerminationError <- runDiscord $ def
-    { discordToken         = botToken botConfig
-    , discordOnEvent       = onDiscordEvent settingsDb
-    , discordOnStart       = onBotStarted settingsDb notifHistoryDb
-    , discordGatewayIntent = def { gatewayIntentMessageContent = False }
-    }
+    & token         .~ botConfig^.botToken
+    & onEvent       .~ onDiscordEvent settingsDb
+    & onStart       .~ onBotStarted settingsDb notifHistoryDb
+    & gatewayIntent .~ (def & messageContent .~ False)
 
   echo $ "A fatal error occurred: " <> botTerminationError

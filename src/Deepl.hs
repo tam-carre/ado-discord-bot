@@ -1,12 +1,12 @@
-{-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE NamedFieldPuns      #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NamedFieldPuns    #-}
 
 module Deepl (translate) where
 
 -- Ado Bot modules
+import Lenses
 import Deepl.Internal (Tl (..))
-import BotConfig      (botConfig, BotConfig (..))
+import BotConfig      (botConfig)
 import Network        (fetchJson')
 import Utils          ((<&>>=))
 
@@ -26,7 +26,7 @@ translate txt =
   req :: Request
   req = "POST https://api-free.deepl.com/v2/translate"
     & setRequestHeader
-        "Authorization" [ "DeepL-Auth-Key " <> encodeUtf8 botConfig.deeplKey ]
+        "Authorization" [ "DeepL-Auth-Key " <> encodeUtf8 (botConfig^.deeplKey) ]
     & setRequestBodyURLEncoded
         [ ("target_lang", "EN")
         , ("text", encodeUtf8 txt)

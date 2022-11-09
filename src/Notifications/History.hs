@@ -32,9 +32,9 @@ import Control.Exception (handle)
 -------------------------------------------------------------------------------
 
 data NotifHistoryDb = NotifHistoryDb
-  { community  :: [Text]
-  , secretBase :: [Text]
-  , ytStream   :: [Text]
+  { _community  :: [Text]
+  , _secretBase :: [Text]
+  , _ytStream   :: [Text]
   }
 
 $(deriveSafeCopy 0 'base ''NotifHistoryDb)

@@ -22,7 +22,7 @@ newtype Lives = Lives [SecretBaseLive] deriving (Show, Eq)
 
 instance FromJSON Lives where
   parseJSON val = do
-    let liveObjs = val ^.. key "data" . key "video_pages" . key "list" . values
+    let liveObjs = val^..key "data".key "video_pages".key "list".values
     lives <- traverse parseJSON liveObjs
     pure . Lives . filter sblStarted $ lives
 

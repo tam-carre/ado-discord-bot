@@ -1,9 +1,9 @@
-{-# LANGUAGE OverloadedRecordDot #-}
-
 module DiscordBot.Perms (PermLvl (..), getPermLvl) where
 
 -- Ado Bot modules
-import BotConfig                  (botConfig, BotConfig (..))
+import Lenses
+import BotConfig                  (botConfig)
+import DiscordBot.Perms.Types     (PermLvl (..))
 import DiscordBot.Guilds.Settings (GuildSettings (..), w64)
 
 -- Downloaded libraries
@@ -16,12 +16,6 @@ import Discord.Types
 
 -------------------------------------------------------------------------------
 
-data PermLvl
-  = PermLvlUser
-  | PermLvlBotManager
-  | PermLvlBotOwner
-  deriving (Eq, Ord, Show)
-
 getPermLvl :: GuildSettings -> GuildMember -> PermLvl
 getPermLvl g member
   | isBotOwner member     = PermLvlBotOwner
@@ -30,9 +24,9 @@ getPermLvl g member
 
 isBotOwner :: GuildMember -> Bool
 isBotOwner member = memberId == ownerId where
-  memberId = member.memberUser <&> userId
-  ownerId  = Just . DiscordId $ Snowflake botConfig.ownerUserId
+  memberId = member^?user._Just <&> userId
+  ownerId  = Just . DiscordId . Snowflake $ botConfig^.ownerUserId
 
 isBotManager :: GuildSettings -> GuildMember -> Bool
-isBotManager g member = maybe False (`elem` rolesOfMember) g.modRole where
-  rolesOfMember = member.memberRoles <&> w64
+isBotManager g member = maybe False (`elem` rolesOfMember) $ g^.modRole where
+  rolesOfMember = member^.roles <&> w64

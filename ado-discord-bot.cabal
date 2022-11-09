@@ -41,13 +41,17 @@ library
       DiscordBot.Events.DiscordAPI.Ready
       DiscordBot.Events.NewCommunityPost
       DiscordBot.Events.NewSecretBase
+      DiscordBot.Events.NewYTChatMsg
       DiscordBot.Events.NewYTStream
       DiscordBot.Events.Notify
+      DiscordBot.Events.Notify.Types
       DiscordBot.Guilds.Settings
       DiscordBot.Perms
+      DiscordBot.Perms.Types
       DiscordBot.SendMessage
       DiscordBot.SlashCommand
-      Json
+      DiscordBot.SlashCommand.Types
+      Lenses
       Network
       Notifications.History
       Notifications.SecretBase
@@ -64,7 +68,7 @@ library
       Paths_ado_discord_bot
   hs-source-dirs:
       src
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       acid-state
     , aeson
@@ -86,6 +90,7 @@ library
     , safecopy
     , servant
     , servant-client
+    , template-haskell
     , text
     , unliftio
     , vector
@@ -97,7 +102,7 @@ executable ado-discord-bot-exe
       Paths_ado_discord_bot
   hs-source-dirs:
       app
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       acid-state
     , ado-discord-bot
@@ -120,6 +125,7 @@ executable ado-discord-bot-exe
     , safecopy
     , servant
     , servant-client
+    , template-haskell
     , text
     , unliftio
     , vector
@@ -136,7 +142,7 @@ test-suite ado-discord-bot-test
       Paths_ado_discord_bot
   hs-source-dirs:
       test
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       acid-state
     , ado-discord-bot
@@ -159,6 +165,7 @@ test-suite ado-discord-bot-test
     , safecopy
     , servant
     , servant-client
+    , template-haskell
     , text
     , unliftio
     , vector

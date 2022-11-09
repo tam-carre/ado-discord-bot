@@ -40,12 +40,12 @@ import qualified Data.Map.Lazy as Map
 -- | I don't know how to make DiscordId serializable for Acid State
 -- so we have to unwrap the DiscordIds into Word64
 data GuildSettings = GuildSettings
-  { communityPostCh   :: Maybe Word64
-  , secretBaseCh      :: Maybe Word64
-  , communityPostRole :: Maybe Word64
-  , secretBaseRole    :: Maybe Word64
-  , modRole           :: Maybe Word64
-  , relayCh           :: Maybe Word64
+  { _communityPostCh   :: Maybe Word64
+  , _secretBaseCh      :: Maybe Word64
+  , _communityPostRole :: Maybe Word64
+  , _secretBaseRole    :: Maybe Word64
+  , _modRole           :: Maybe Word64
+  , _relayCh           :: Maybe Word64
   }
 $(deriveSafeCopy 0 'base ''GuildSettings)
 

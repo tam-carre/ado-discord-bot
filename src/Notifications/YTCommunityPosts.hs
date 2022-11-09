@@ -1,7 +1,6 @@
 {-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE OverloadedRecordDot #-}
-{-# LANGUAGE ViewPatterns        #-}
 {-# LANGUAGE NamedFieldPuns      #-}
+{-# LANGUAGE TypeApplications    #-}
 
 module Notifications.YTCommunityPosts
   ( CommunityPost (..)
@@ -9,7 +8,8 @@ module Notifications.YTCommunityPosts
   ) where
 
 -- Ado Bot modules
-import Notifications.YTCommunityPosts.Internal (CommunityPost (..), extractData)
+import Lenses
+import Notifications.YTCommunityPosts.Internal (CommunityPost (..))
 import Utils                                   (betweenSubstrs)
 import Notifications.Utils                     (returnWhenFound)
 import Notifications.History
@@ -21,7 +21,7 @@ import Notifications.History
 -- Downloaded libraries
 import Data.Acid  (AcidState)
 import Data.Text  (isInfixOf)
-import Data.Aeson (Value (..), decode)
+import Data.Aeson (eitherDecode)
 import Network.HTTP.Simple
   ( parseRequest
   , getResponseStatusCode
@@ -42,20 +42,19 @@ getNextNewCommunityPost = returnWhenFound latestCommunityPost "New community pos
 -- what problem it encountered.
 latestCommunityPost :: MonadIO m => AcidState NotifHistoryDb -> m (Either Text CommunityPost)
 latestCommunityPost db = do
-  request <- liftIO $ get' url
+  request <- liftIO $ get' "https://www.youtube.com/c/Ado1024/community"
   response <- httpBS . eng $ request
 
   let status  = getResponseStatusCode response
       jsonStr = getPayload . decodeUtf8 $ getResponseBody response
 
   case (status, jsonStr) of
-    (200, Just payload) -> case decode payload :: Maybe Value of
-      Just (extractData -> Right post@(CommunityPost { postId, date })) ->
-        if isToday date then do
+    (200, Just payload) -> case eitherDecode @CommunityPost payload of
+      Right post@(CommunityPost { _postId, _date }) ->
+        if isToday _date then do
           notifHistory <- getNotifHistory db
-          if postId `notElem` notifHistory.community then do
-            changeNotifHistory db
-              (\hist -> hist { community = postId : take 50 hist.community })
+          if _postId `notElem` (notifHistory^.community) then do
+            changeNotifHistory db . over community $ \h -> _postId : take 50 h
 
             pure $ Right post
 
@@ -63,14 +62,12 @@ latestCommunityPost db = do
 
         else err "Found post but it's older than an hour"
 
-      Just (extractData -> Left e) -> err $ "Failed to extract: " <> show e
-      _                            -> err "Found JSON but failed to decode"
+      Left e -> err $ "Failed to extract: " <> show e
 
     (200, Nothing) -> err "Failed to extract JSON from HTML source"
     _              -> err "Non-200 status code"
 
   where
-  url  = "https://www.youtube.com/c/Ado1024/community"
   eng  = setRequestHeader "Accept-Language" ["en"]
   get' = parseRequest . ("GET " <>)
   err  = pure . Left . ("[Community] " <>)

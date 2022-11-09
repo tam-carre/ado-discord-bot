@@ -1,81 +1,48 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Notifications.YTCommunityPosts.Internal
-  ( CommunityPost (..)
-  , extractData
-  ) where
+module Notifications.YTCommunityPosts.Internal (CommunityPost (..)) where
 
-import Data.Aeson (Value (..))
-import Json       ((?.), (?!!), unArr, unStr)
-import qualified Data.Vector as Vector
+-- Downloaded libraries
+import Control.Lens ((^.), (^..), (^?))
+import Data.Aeson (FromJSON (..))
+import Data.Aeson.Lens (key, values, _String, nth)
 
 -------------------------------------------------------------------------------
 
 data CommunityPost = CommunityPost
-  { author  :: Text
-  , avatar  :: Text
-  , postId  :: Text
-  , date    :: Text
-  , content :: Text
+  { _author  :: Text
+  , _avatar  :: Text
+  , _postId  :: Text
+  , _date    :: Text
+  , _content :: Text
   } deriving (Show, Eq)
 
-extractData :: Value -> Either Text CommunityPost
-extractData ytData = do
-  tabs <- pure ytData
-    ?. "contents"
-    ?. "twoColumnBrowseResultsRenderer"
-    ?. "tabs"
-   >>= unArr
+instance FromJSON CommunityPost where
+  parseJSON ytData = do
+    let tabs = ytData^..key "contents".key "twoColumnBrowseResultsRenderer".key "tabs".values
+        isCommunity t = t^.key "tabRenderer".key "title"._String == "Community"
 
-  communityTab <-
-    case
-      Vector.find
-        (\t -> pure t ?. "tabRenderer" ?. "title" == Right "Community")
-        tabs
-    of
-      Nothing -> Left $ "Could not find community tab in "<> show tabs
-      Just t  -> Right t
+    communityTab <- case find isCommunity tabs of
+      Nothing -> fail $ "Coult not find community tab in " <> show tabs
+      Just t  -> pure t
 
-  latestPost <- pure communityTab
-    ?. "tabRenderer"
-    ?. "content"
-    ?. "sectionListRenderer"
-    ?. "contents" ?!! 0
-    ?. "itemSectionRenderer"
-    ?. "contents" ?!! 0
-    ?. "backstagePostThreadRenderer"
-    ?. "post"
-    ?. "backstagePostRenderer"
+    let latestPost = communityTab^?key "tabRenderer"
+                                  .key "content"
+                                  .key "sectionListRenderer"
+                                  .key "contents".nth 0
+                                  .key "itemSectionRenderer"
+                                  .key "contents".nth 0
+                                  .key "backstagePostThreadRenderer"
+                                  .key "post"
+                                  .key "backstagePostRenderer"
 
-  content' <- pure latestPost
-    ?. "contentText"
-    ?. "runs"
-   >>= unArr
-   >>= traverse (\el -> pure el ?. "text" >>= unStr)
-   <&> Vector.foldr (<>) ""
+    p <- maybe (fail "Could not find latest post") pure latestPost
 
-  -- | relative date e.g. "1 hour ago"
-  date' <- pure latestPost
-    ?. "publishedTimeText"
-    ?. "runs" ?!! 0
-    ?. "text"
-   >>= unStr
-
-  postId' <- pure latestPost ?. "postId" >>= unStr
-
-  author' <- pure latestPost ?. "authorText" ?. "runs" ?!! 0 ?. "text" >>= unStr
-
-  avatar' <- pure latestPost
-    ?. "authorThumbnail"
-    ?. "thumbnails" ?!! 2
-    ?. "url"
-   >>= unStr
-   <&> ("https:" <>)
-
-  pure $ CommunityPost
-    { author  = author'
-    , avatar  = avatar'
-    , postId  = postId'
-    , date    = date'
-    , content = content'
-    }
+    pure $ CommunityPost
+      { _author  = p^.key "authorText".key "runs".nth 0.key "text"._String
+      , _avatar  = "https:" <> p^.key "authorThumbnail".key "thumbnails".nth 2.key "url"._String
+      , _postId  = p^.key "postId"._String
+      , _date    = p^.key "publishedTimeText".key "runs".nth 0.key "text"._String
+      , _content = foldr ((<>) . (\el -> el^.key "text"._String)) "" $
+                     p^..key "contentText".key "runs".values
+      }

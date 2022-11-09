@@ -18,11 +18,11 @@ import DiscordBot.SlashCommand
 
 pingCmd :: SlashCommand
 pingCmd = slash $ SlashProps
-  { name    = "ping"
-  , desc    = "Sends an input back"
-  , permLvl = PermLvlUser
-  , options = [ optionString "input" "The text to send back" ]
-  , handler = \_db intr _mem _guildId opts -> do
+  { _name    = "ping"
+  , _desc    = "Sends an input back"
+  , _permLvl = PermLvlUser
+  , _options = [ optionString "input" "The text to send back" ]
+  , _handler = \_db intr _mem _guildId opts -> do
       input <- required getStrOpt "input" opts
 
       replyEmbed intr input

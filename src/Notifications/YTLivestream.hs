@@ -1,10 +1,10 @@
 {-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE OverloadedRecordDot #-}
 {-# LANGUAGE TypeApplications    #-}
 
 module Notifications.YTLivestream (VideoId, getNextNewLivestream) where
 
 -- Ado Bot modules
+import Lenses
 import Notifications.YTLivestream.Internal (VideoIdExtraction (..))
 import Utils                               (betweenSubstrs)
 import Notifications.Utils                 (returnWhenFound)
@@ -50,9 +50,8 @@ newLivestream db = do
       case eitherDecode @VideoIdExtraction payload of
         Right (VideoId vidId) -> do
           notifHistory <- getNotifHistory db
-          if vidId `notElem` notifHistory.ytStream then do
-            changeNotifHistory db
-              (\hist -> hist { ytStream = vidId : take 50 hist.ytStream })
+          if vidId `notElem` (notifHistory^.ytStream) then do
+            changeNotifHistory db . over ytStream $ \h -> vidId : take 50 h
 
             pure $ Right vidId
 
