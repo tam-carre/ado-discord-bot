@@ -19,11 +19,11 @@ spec =
       expectedResult =
         Right $ Lives
           [ SecretBaseLive
-            { sblThumb = "https://ado-dokidokihimitsukichi-daigakuimo.com/public_html/contents/video_pages/7646/thumbnail_path"
-            , sblDesc = "Watch at <https://ado-dokidokihimitsukichi-daigakuimo.com/video/smWXYmwkUvjjgDReUjDbE4Le>"
-            , sblTitle = "jptxt"
-            , sblUrl = "https://ado-dokidokihimitsukichi-daigakuimo.com/video/smWXYmwkUvjjgDReUjDbE4Le"
-            , sblStarted = True
+            { _thumb = "https://ado-dokidokihimitsukichi-daigakuimo.com/public_html/contents/video_pages/7646/thumbnail_path"
+            , _desc = "Watch at <https://ado-dokidokihimitsukichi-daigakuimo.com/video/smWXYmwkUvjjgDReUjDbE4Le>"
+            , _title = "jptxt"
+            , _url = "https://ado-dokidokihimitsukichi-daigakuimo.com/video/smWXYmwkUvjjgDReUjDbE4Le"
+            , _started = True
             }
           ]
 

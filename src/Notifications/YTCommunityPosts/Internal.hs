@@ -12,7 +12,7 @@ import Data.Aeson.Lens (key, values, _String, nth)
 data CommunityPost = CommunityPost
   { _author  :: Text
   , _avatar  :: Text
-  , _postId  :: Text
+  , _id  :: Text
   , _date    :: Text
   , _content :: Text
   } deriving (Show, Eq)
@@ -41,7 +41,7 @@ instance FromJSON CommunityPost where
     pure $ CommunityPost
       { _author  = p^.key "authorText".key "runs".nth 0.key "text"._String
       , _avatar  = "https:" <> p^.key "authorThumbnail".key "thumbnails".nth 2.key "url"._String
-      , _postId  = p^.key "postId"._String
+      , _id      = p^.key "postId"._String
       , _date    = p^.key "publishedTimeText".key "runs".nth 0.key "text"._String
       , _content = foldr ((<>) . (\el -> el^.key "text"._String)) "" $
                      p^..key "contentText".key "runs".values

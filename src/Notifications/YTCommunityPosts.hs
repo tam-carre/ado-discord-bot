@@ -1,5 +1,4 @@
 {-# LANGUAGE OverloadedStrings   #-}
-{-# LANGUAGE NamedFieldPuns      #-}
 {-# LANGUAGE TypeApplications    #-}
 
 module Notifications.YTCommunityPosts
@@ -9,7 +8,7 @@ module Notifications.YTCommunityPosts
 
 -- Ado Bot modules
 import Lenses
-import App                                     (App, Db (..))
+import App                                     (App)
 import Notifications.YTCommunityPosts.Internal (CommunityPost (..))
 import Utils                                   (betweenSubstrs)
 import Notifications.Utils                     (returnWhenFound)
@@ -46,12 +45,11 @@ latestCommunityPost = do
 
   case (status, jsonStr) of
     (200, Just payload) -> case eitherDecode @CommunityPost payload of
-      Right post@(CommunityPost { _postId, _date }) ->
-        if isToday _date then do
-          db <- asks notifDb
-          notifHistory <- getNotifHistory db
-          if _postId `notElem` (notifHistory^.community) then do
-            changeNotifHistory db . over community $ \h -> _postId : take 50 h
+      Right post ->
+        if isToday (post^.date) then do
+          notifHistory <- getNotifHistory
+          if (post^.id) `notElem` (notifHistory^.community) then do
+            changeNotifHistory . over community $ \h -> (post^.id) : take 50 h
 
             pure $ Right post
 

@@ -5,7 +5,7 @@ module DiscordBot.Events.Notify (notify, Notif (..)) where
 
 -- Ado Bot modules
 import Lenses
-import App                            (App, Db (..))
+import App                            (App, Env (..))
 import Utils                          (decorate)
 import DiscordBot.Events.Notify.Types (Notif (..))
 import DiscordBot.SendMessage         (sendWithEmbed', embed)

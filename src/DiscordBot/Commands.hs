@@ -1,27 +1,47 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module DiscordBot.Commands (appCommands, cmdByName) where
 
 -- Ado Bot modules
-import DiscordBot.Commands.Ping           (pingCmd)
-import DiscordBot.Commands.Community      (communityCmd)
-import DiscordBot.Commands.ModRole        (modRoleCmd)
-import DiscordBot.Commands.SecretBase     (secretBaseCmd)
-import DiscordBot.Commands.CommunityRole  (communityRoleCmd)
-import DiscordBot.Commands.SecretBaseRole (secretBaseRoleCmd)
-import DiscordBot.Commands.Relay          (relayCmd)
-import DiscordBot.SlashCommand            (SlashCommand (..))
+import Lenses
+import DiscordBot.SlashCommand
+  ( SlashCommand (..)
+  , notificationChCmd
+  , notificationChCmdNoRole
+  , roleCmd
+  )
 
 -------------------------------------------------------------------------------
 
 appCommands :: [SlashCommand]
 appCommands =
-  [ pingCmd
-  , communityCmd
+  [ communityCmd
   , secretBaseCmd
-  , communityRoleCmd
-  , secretBaseRoleCmd
-  , modRoleCmd
   , relayCmd
+  , modRoleCmd
   ]
 
 cmdByName :: Text -> Maybe SlashCommand
-cmdByName cmdName = find ((==) cmdName  . _name) appCommands
+cmdByName cmdName = find ((==) cmdName  . view name) appCommands
+
+communityCmd :: SlashCommand
+communityCmd = notificationChCmd "community"
+  "Ado's community post"
+  communityPostCh
+  "will receive notifications for Ado's YouTube community posts"
+  communityPostRole
+
+secretBaseCmd :: SlashCommand
+secretBaseCmd = notificationChCmd "secretbase"
+  "Ado's Secret Base stream"
+  secretBaseCh
+  "will receive notifications for Ado's Secret Base streams"
+  secretBaseRole
+
+relayCmd :: SlashCommand
+relayCmd = notificationChCmdNoRole "relay"
+  "YouTube livechat TL and Ado's own message"
+  relayCh
+
+modRoleCmd :: SlashCommand
+modRoleCmd = roleCmd "modrole" "can manage this bot" modRole

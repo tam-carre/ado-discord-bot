@@ -12,7 +12,8 @@ module DiscordBot.SendMessage
 
 -- Ado Bot modules
 import Lenses
-import App    (App)
+import App                        (App)
+import DiscordBot.Guilds.Settings (w64DId)
 
 -- Downloaded libraries
 import Discord (restCall, def)
@@ -68,7 +69,7 @@ send content' cid = lift . void . restCall $ R.CreateMessage cid content'
 
 -- | like `send` but accepts an unwrapped Word64
 send' :: Text -> Word64 -> App ()
-send' content' = send content' . DiscordId . Snowflake
+send' content' = send content' . w64DId
 
 sendWithEmbed :: ChannelId -> Text -> CreateEmbed -> App ()
 sendWithEmbed cid txt emb = do

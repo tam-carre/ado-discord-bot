@@ -1,31 +1,33 @@
-{-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE OverloadedStrings  #-}
-{-# LANGUAGE TemplateHaskell    #-}
 {-# LANGUAGE TypeFamilies       #-}
-{-# LANGUAGE LambdaCase         #-}
 
 module DiscordBot.Guilds.Settings
   ( GuildSettings (..)
-  , SettingsDb
+  , SettingsDb (..)
   , getSettings
   , getAllSettings
   , getSettingsDb
   , changeSettings
   , dId
   , w64
+  , w64DId
   ) where
 
 -- Ado Bot modules
+import App   (App, Env (settingsDb))
 import Utils (tap)
+import DiscordBot.Guilds.Settings.Internal
+  ( SettingsDb (..)
+  , GuildSettings (..)
+  , FindAll (..)
+  , FindOne (..)
+  , Upsert (..)
+  )
 
 -- Downloaded libraries
-import Data.SafeCopy (deriveSafeCopy, base)
-import Discord.Types (Snowflake (unSnowflake), DiscordId (unId))
+import Discord.Types (Snowflake (..), DiscordId (..))
 import Data.Acid
-  ( Update
-  , Query
-  , makeAcidic
-  , openLocalState
+  ( openLocalState
   , update
   , query
   , AcidState
@@ -34,49 +36,6 @@ import Data.Acid
 -- Base
 import Control.Exception (handle)
 import qualified Data.Map.Lazy as Map
-
--------------------------------------------------------------------------------
-
--- | I don't know how to make DiscordId serializable for Acid State
--- so we have to unwrap the DiscordIds into Word64
-data GuildSettings = GuildSettings
-  { _communityPostCh   :: Maybe Word64
-  , _secretBaseCh      :: Maybe Word64
-  , _communityPostRole :: Maybe Word64
-  , _secretBaseRole    :: Maybe Word64
-  , _modRole           :: Maybe Word64
-  , _relayCh           :: Maybe Word64
-  }
-$(deriveSafeCopy 0 'base ''GuildSettings)
-
-data SettingsDb = SettingsDb !(Map Word64 GuildSettings)
-$(deriveSafeCopy 0 'base ''SettingsDb)
-
--------------------------------------------------------------------------------
-
--- Internals (Due to TH they cannot be at the bottom)
-
-findOne :: Word64 -> Query SettingsDb GuildSettings
-findOne guildId = byGuildId guildId <$> ask
-
-findAll :: Query SettingsDb (Map Word64 GuildSettings)
-findAll = unSettingsDb <$> ask
-
-upsert :: Word64 -> GuildSettings -> Update SettingsDb ()
-upsert guildId new = put . setByGuildId guildId new =<< get
-
-byGuildId :: Word64 -> SettingsDb -> GuildSettings
-byGuildId guildId (SettingsDb allS) =
-  fromMaybe (GuildSettings Nothing Nothing Nothing Nothing Nothing Nothing)
-    $ Map.lookup guildId allS
-
-unSettingsDb :: SettingsDb -> Map Word64 GuildSettings
-unSettingsDb (SettingsDb theMap) = theMap
-
-setByGuildId :: Word64 -> GuildSettings -> SettingsDb -> SettingsDb
-setByGuildId guildId new (SettingsDb allS) = SettingsDb $ Map.insert guildId new allS
-
-$(makeAcidic ''SettingsDb ['findOne, 'upsert, 'findAll])
 
 ------------------------------------------------------------------------------
 
@@ -89,8 +48,10 @@ getSettingsDb = openLocalState (SettingsDb Map.empty)
   & handle (\e -> die $ "Problem accessing DB: " <> show (e :: SomeException))
 
 -- | Get a guild's settings
-getSettings :: MonadIO m => AcidState SettingsDb -> DiscordId a -> m GuildSettings
-getSettings db guildId = liftIO . query db . FindOne $ w64 guildId
+getSettings :: DiscordId a -> App GuildSettings
+getSettings guildId = do
+  db <- asks settingsDb
+  liftIO . query db . FindOne $ w64 guildId
 
 -- | Get a guild's settings
 getAllSettings :: MonadIO m => AcidState SettingsDb -> m (Map Word64 GuildSettings)
@@ -104,12 +65,12 @@ w64 = unSnowflake . unId
 dId :: DiscordId a -> Maybe Word64
 dId = Just . w64
 
+w64DId :: Word64 -> DiscordId a
+w64DId = DiscordId . Snowflake
+
 -- | Apply a function over a guild's settings
-changeSettings :: MonadIO m
-  => AcidState SettingsDb
-  -> DiscordId a
-  -> (GuildSettings -> GuildSettings)
-  -> m ()
-changeSettings db guildId f = liftIO $ do
-  old <- getSettings db guildId
-  update db $ Upsert (w64 guildId) (f old)
+changeSettings :: DiscordId a -> (GuildSettings -> GuildSettings) -> App ()
+changeSettings guildId f = do
+  db <- asks settingsDb
+  old <- getSettings guildId
+  liftIO . update db $ Upsert (w64 guildId) (f old)

@@ -18,11 +18,11 @@ spec =
     let
       expectedResult =
         Right $ CommunityPost
-          { author = "dummy"
-          , avatar = "https:dummy"
-          , postId = "dummy"
-          , date = "dummy"
-          , content = "dummydummydummydummydummydummydummy"
+          { _author = "dummy"
+          , _avatar = "https:dummy"
+          , _id = "dummy"
+          , _date = "dummy"
+          , _content = "dummydummydummydummydummydummydummy"
           }
 
       validPayload =

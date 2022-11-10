@@ -29,24 +29,15 @@ library
       Deepl
       Deepl.Internal
       DiscordBot.Commands
-      DiscordBot.Commands.Community
-      DiscordBot.Commands.CommunityRole
-      DiscordBot.Commands.ModRole
-      DiscordBot.Commands.Ping
-      DiscordBot.Commands.Relay
-      DiscordBot.Commands.SecretBase
-      DiscordBot.Commands.SecretBaseRole
       DiscordBot.Events
-      DiscordBot.Events.BotStarted
+      DiscordBot.Events.BotStartedStartNotifiers
       DiscordBot.Events.DiscordAPI.InteractionCreate
       DiscordBot.Events.DiscordAPI.Ready
-      DiscordBot.Events.NewCommunityPost
-      DiscordBot.Events.NewSecretBase
       DiscordBot.Events.NewYTChatMsg
-      DiscordBot.Events.NewYTStream
       DiscordBot.Events.Notify
       DiscordBot.Events.Notify.Types
       DiscordBot.Guilds.Settings
+      DiscordBot.Guilds.Settings.Internal
       DiscordBot.Perms
       DiscordBot.Perms.Types
       DiscordBot.SendMessage
@@ -55,6 +46,7 @@ library
       Lenses
       Network
       Notifications.History
+      Notifications.History.Internal
       Notifications.SecretBase
       Notifications.SecretBase.Internal
       Notifications.Utils
@@ -93,6 +85,7 @@ library
     , servant-client
     , template-haskell
     , text
+    , time
     , unliftio
     , vector
   default-language: Haskell2010
@@ -128,6 +121,7 @@ executable ado-discord-bot-exe
     , servant-client
     , template-haskell
     , text
+    , time
     , unliftio
     , vector
   default-language: Haskell2010
@@ -168,6 +162,7 @@ test-suite ado-discord-bot-test
     , servant-client
     , template-haskell
     , text
+    , time
     , unliftio
     , vector
   default-language: Haskell2010

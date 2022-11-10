@@ -10,6 +10,7 @@ import qualified Tokens -- not version controlled obv
 data BotConfig = BotConfig
   { _botToken            :: Text
   , _deeplKey            :: Text
+  , _ownerDebugGuildId   :: Word64
   , _ownerDebugChannelId :: Word64
   , _ownerUserId         :: Word64
   , _inviteUrl           :: Text
@@ -18,6 +19,7 @@ data BotConfig = BotConfig
 botConfig :: BotConfig
 botConfig = BotConfig
   { _botToken = Tokens.discord
+  , _ownerDebugGuildId = 797780320405553223
   , _ownerDebugChannelId = 1031895573218983968
   , _ownerUserId = 150696503428644864
   , _deeplKey = Tokens.deepl

@@ -36,6 +36,7 @@ dependencies:
 - lens-aeson
 - mtl
 - template-haskell
+- time
 
 ghc-options:
 - -Wall

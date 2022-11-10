@@ -8,7 +8,7 @@ module DiscordBot.Events.DiscordAPI.InteractionCreate
 
 -- Ado Bot modules
 import Lenses
-import App                        (App, Db (..))
+import App                        (App)
 import DiscordBot.Guilds.Settings (getSettings)
 import DiscordBot.SendMessage     (replyEmbed)
 import DiscordBot.Commands        (cmdByName)
@@ -31,8 +31,7 @@ onInteractionCreate :: Interaction -> App ()
 onInteractionCreate i = case interactionToSlashCommand i of
   Left err -> echo err
   Right SlashCommandData { slashCmd, mem, gid, opts, intr } -> do
-    db <- asks settingsDb
-    gSettings <- getSettings db gid
+    gSettings <- getSettings gid
     if getPermLvl gSettings mem < slashCmd^.permLvl
       then replyEmbed intr "Insufficient permissions."
       else (slashCmd^.handler) intr mem gid opts

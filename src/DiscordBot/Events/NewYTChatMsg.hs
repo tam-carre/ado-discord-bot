@@ -8,10 +8,10 @@ module DiscordBot.Events.NewYTChatMsg (onNewYTChatMsg) where
 
 -- Ado Bot modules
 import Lenses
-import App                        (App, Db (..))
+import App                        (App, Env (..))
 import Deepl                      (translate)
 import DiscordBot.SendMessage     (send')
-import DiscordBot.Guilds.Settings (GuildSettings (..), getAllSettings)
+import DiscordBot.Guilds.Settings (getAllSettings)
 
 -- Downloaded libraries
 import Data.Aeson (withObject, (.:), eitherDecode, FromJSON (..))
@@ -28,7 +28,7 @@ makeFieldsNoPrefix ''Msg
 onNewYTChatMsg :: L.Text -> App (Either Void ())
 onNewYTChatMsg line = do
   allSettings <- getAllSettings =<< asks settingsDb
-  let channelsAwaitingMsg = mapMaybe _relayCh $ Map.elems allSettings
+  let channelsAwaitingMsg = mapMaybe (view relayCh) $ Map.elems allSettings
   case eitherDecode @Msg (Lazy.Encoding.encodeUtf8 line) of
     Left e -> err $ "error parsing msg " <> toText e
     Right msg

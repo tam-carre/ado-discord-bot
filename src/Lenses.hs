@@ -14,9 +14,9 @@ module Lenses (module Lenses, module Control.Lens) where
 import Utils                                   (makeFieldsOptionalPrefix)
 import BotConfig                               (BotConfig (..))
 import Notifications.History                   (NotifHistoryDb (..))
-import Notifications.SecretBase.Internal       (SecretBaseLive (..))
+import Notifications.SecretBase.Internal       (SecretBaseLive (..), SecretBaseVid (..))
 import Notifications.YTCommunityPosts.Internal (CommunityPost (..))
-import DiscordBot.Guilds.Settings              (GuildSettings (..))
+import DiscordBot.Guilds.Settings.Internal     (GuildSettings (..))
 import DiscordBot.Events.Notify.Types          (Notif (..))
 import DiscordBot.SlashCommand.Types           (SlashCommand (..), SlashProps (..))
 
@@ -32,7 +32,6 @@ import Discord.Requests
 makeFields ''Interaction
 
 makeLensesWith abbreviatedFields ''GuildMember
-makeLensesWith abbreviatedFields ''SecretBaseLive
 makeLensesWith abbreviatedFields ''CreateApplicationCommand
 makeLensesWith abbreviatedFields ''RunDiscordOpts
 
@@ -44,6 +43,8 @@ makeFields ''ApplicationCommand
 makeFieldsOptionalPrefix "messageDetailed" ''MessageDetailedOpts
 makeFieldsOptionalPrefix "applicationCommandData" ''ApplicationCommandData
 
+makeFieldsNoPrefix ''SecretBaseLive
+makeFieldsNoPrefix ''SecretBaseVid
 makeFieldsNoPrefix ''BotConfig
 makeFieldsNoPrefix ''GuildSettings
 makeFieldsNoPrefix ''Notif
