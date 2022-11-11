@@ -5,7 +5,14 @@
 module NotificationsSecretBaseSpec (spec) where
 
 -- Ado Bot modules
-import Notifications.SecretBase.Internal (Lives (..), SecretBaseLive (..), Vids (..))
+import Network (fetchJson)
+import Notifications.SecretBase.Internal
+  ( Lives (..)
+  , SecretBaseLive (..)
+  , Vids (..)
+  , secretBaseVidsApi
+  , secretBaseStreamsApi
+  )
 
 -- Downloaded libraries
 import Test.Hspec (Spec, shouldBe, it)
@@ -15,6 +22,14 @@ import Data.Aeson (eitherDecode)
 
 spec :: Spec
 spec = do
+  it "Should succeed making a HTTP req to the videolist endpoint and parsing the response" $ do
+    requestAndParsingResult <- fetchJson @Vids secretBaseVidsApi
+    isRight requestAndParsingResult `shouldBe` True
+
+  it "Should succeed making a HTTP req to the streamlist endpoint and parsing the response" $ do
+    requestAndParsingResult <- fetchJson @Lives secretBaseStreamsApi
+    isRight requestAndParsingResult `shouldBe` True
+
   it "Should succeed parsing a valid payload for livestreams" $ do
     let
       expectedResult =

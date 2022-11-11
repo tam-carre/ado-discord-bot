@@ -7,14 +7,17 @@ module Notifications.SecretBase.Internal
   , SecretBaseLive (..)
   , Vids (..)
   , SecretBaseVid (..)
+  , secretBaseStreamsApi
+  , secretBaseVidsApi
   ) where
 
 -- Downloaded libraries
-import Data.Aeson       (FromJSON (parseJSON), (.:), (.:?), withObject)
-import Data.Aeson.Lens  (key, values, AsValue)
-import Data.Aeson.Types (Parser)
-import Data.Time        (parseTimeM, defaultTimeLocale, UTCTime)
-import Control.Lens     ((^..))
+import Data.Aeson          (FromJSON (parseJSON), (.:), (.:?), withObject)
+import Data.Aeson.Lens     (key, values, AsValue)
+import Data.Aeson.Types    (Parser)
+import Data.Time           (parseTimeM, defaultTimeLocale, UTCTime)
+import Control.Lens        ((^..))
+import Network.HTTP.Client (Request)
 
 -------------------------------------------------------------------------------
 
@@ -73,3 +76,11 @@ vidListParser constructor val = do
 
 frameBaseUrl :: Text
 frameBaseUrl = "https://ado-dokidokihimitsukichi-daigakuimo.com/video/"
+
+secretBaseStreamsApi :: Request
+secretBaseStreamsApi =
+  "https://nfc-api.ado-dokidokihimitsukichi-daigakuimo.com/fc/fanclub_sites/95/live_pages?page=1&live_type=1&per_page=1"
+
+secretBaseVidsApi :: Request
+secretBaseVidsApi =
+  "https://nfc-api.ado-dokidokihimitsukichi-daigakuimo.com/fc/fanclub_sites/95/video_pages?vod_type=0&tag=%E5%8B%95%E7%94%BB&sort=-released_at&page=1&per_page=12"

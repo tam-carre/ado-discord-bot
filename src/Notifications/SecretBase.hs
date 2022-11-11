@@ -22,6 +22,8 @@ import Notifications.SecretBase.Internal
   , SecretBaseLive (..)
   , SecretBaseVid (..)
   , Vids (..)
+  , secretBaseVidsApi
+  , secretBaseStreamsApi
   )
 
 -- Downloaded libraries
@@ -40,7 +42,7 @@ getNextNewSecretBaseVid = returnWhenFound latestSecretBaseVid "New Secret Base"
 -- | Returns a freshly started Secret Base stream by Ado, or a Left explaining
 -- what problem it encountered.
 latestSecretBaseStream :: App (Either Text SecretBaseLive)
-latestSecretBaseStream = fetchJson @Lives endpoint >>>= \case
+latestSecretBaseStream = fetchJson @Lives secretBaseStreamsApi >>>= \case
   Lives [] -> err "No ongoing live"
   Lives lives -> do
     notifHistory <- getNotifHistory
@@ -51,13 +53,12 @@ latestSecretBaseStream = fetchJson @Lives endpoint >>>= \case
         changeNotifHistory . over sbStream $ \hist -> (live^.url) : take 50 hist
         pure $ Right live
   where
-  endpoint = "https://nfc-api.ado-dokidokihimitsukichi-daigakuimo.com/fc/fanclub_sites/95/live_pages?page=1&live_type=1&per_page=1"
   err = pure . Left . ("[Secret Base Stream] " <>)
 
 -- | Returns a freshly uploaded Secret Base video by Ado, or a Left explaining
 -- what problem it encountered.
 latestSecretBaseVid :: App (Either Text SecretBaseVid)
-latestSecretBaseVid = fetchJson @Vids endpoint >>>= \(Vids vids) -> do
+latestSecretBaseVid = fetchJson @Vids secretBaseVidsApi >>>= \(Vids vids) -> do
   currTime <- liftIO getCurrentTime
   let isNew vid = 300 > nominalDiffTimeToSeconds (diffUTCTime currTime (vid^.date))
   notifHistory <- getNotifHistory
@@ -69,5 +70,4 @@ latestSecretBaseVid = fetchJson @Vids endpoint >>>= \(Vids vids) -> do
       changeNotifHistory . over sbVid $ \hist -> (video^.url) : take 50 hist
       pure $ Right video
   where
-  endpoint = "https://nfc-api.ado-dokidokihimitsukichi-daigakuimo.com/fc/fanclub_sites/95/video_pages?vod_type=0&tag=%E5%8B%95%E7%94%BB&sort=-released_at&page=1&per_page=12"
   err = pure . Left . ("[Secret Base Vid] " <>)
