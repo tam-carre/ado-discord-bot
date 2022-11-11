@@ -127,10 +127,10 @@ onNewYTStream vidId = do
     , _msgTxt         = Nothing
     }
 
-  db <- ask
+  env <- ask
   discordHandle <- lift ask
-  let onMsgDiscord line = runReaderT (onNewYTChatMsg line) db
-      onMsgIO      line = runReaderT (onMsgDiscord line)   discordHandle
+  let onMsgDiscord = usingReaderT env . onNewYTChatMsg
+      onMsgIO      = usingReaderT discordHandle . onMsgDiscord
 
   liftIO $ execute
     (piped . shell $ "node ./masterchat/index.js " <> toString vidId)

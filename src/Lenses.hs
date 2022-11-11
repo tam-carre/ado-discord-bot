@@ -19,6 +19,7 @@ import Notifications.YTCommunityPosts.Internal (CommunityPost (..))
 import DiscordBot.Guilds.Settings.Internal     (GuildSettings (..))
 import DiscordBot.Events.Notify.Types          (Notif (..))
 import DiscordBot.SlashCommand.Types           (SlashCommand (..), SlashProps (..))
+import DiscordBot.Events.NewYTChatMsg.Internal (Msg (..))
 
 -- Downloaded libraries
 import Control.Lens -- Not sure if reexporting everything is a good idea, we'll see
@@ -52,3 +53,4 @@ makeFieldsNoPrefix ''NotifHistoryDb
 makeFieldsNoPrefix ''CommunityPost
 makeFieldsNoPrefix ''SlashCommand
 makeFieldsNoPrefix ''SlashProps
+makeFieldsNoPrefix ''Msg

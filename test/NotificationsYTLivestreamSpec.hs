@@ -4,16 +4,34 @@
 module NotificationsYTLivestreamSpec (spec) where
 
 -- Ado Bot modules
-import Notifications.YTLivestream.Internal (VideoIdExtraction (..), getYtChannelPayload)
+import Notifications.YTLivestream.Internal     (VideoIdExtraction (..), getYtChannelPayload)
+import DiscordBot.Events.NewYTChatMsg.Internal (Msg)
 
 -- Downloaded libraries
-import Test.Hspec (Spec, shouldBe, it)
-import Data.Aeson (eitherDecode)
+import Test.Hspec     (Spec, shouldBe, it)
+import Data.Aeson     (eitherDecode)
+import System.Process
+  ( shell
+  , createProcess
+  , StdStream (..)
+  , CreateProcess (..)
+  , waitForProcess
+  )
+import System.Exit (ExitCode (ExitSuccess))
+import Data.ByteString.Lazy (hGetContents)
 
 -------------------------------------------------------------------------------
 
 spec :: Spec
 spec = do
+  it "Should successfully run masterchat and parse a livechat msg" $ do
+    (_, Just ho1, _, hp1) <- createProcess (shell "node ./masterchat/index.js TEST")
+                              { std_out = CreatePipe }
+    output <- hGetContents ho1
+    exitCode <- waitForProcess hp1
+    exitCode `shouldBe` ExitSuccess
+    isRight (eitherDecode @Msg output) `shouldBe` True
+
   it "Should get a 200 status code from the channel page" $ do
     (statusCode, _) <- getYtChannelPayload
     statusCode `shouldBe` 200

@@ -1,7 +1,21 @@
 const { Masterchat } = require('masterchat')
 
+const msg = (content, authorName, authorChannelId) => ({ content, authorName, authorChannelId })
+
 const main = async () => {
   const firstArg = process.argv[2]
+
+  if (firstArg === 'TEST') {
+    console.log(
+      JSON.stringify({
+        content: 'dummy content',
+        authorName: 'dummy authorName',
+        authorChannelId: 'dummy authorChannelId',
+      })
+    )
+    return
+  }
+
   const mc = await Masterchat.init(firstArg)
 
   const chats = mc.iter().filter((action) => action.type === 'addChatItemAction')

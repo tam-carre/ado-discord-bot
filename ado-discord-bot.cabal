@@ -34,6 +34,7 @@ library
       DiscordBot.Events.DiscordAPI.InteractionCreate
       DiscordBot.Events.DiscordAPI.Ready
       DiscordBot.Events.NewYTChatMsg
+      DiscordBot.Events.NewYTChatMsg.Internal
       DiscordBot.Events.Notify
       DiscordBot.Events.Notify.Types
       DiscordBot.Guilds.Settings
