@@ -21,8 +21,6 @@ import Control.Exception (handle)
 
 -------------------------------------------------------------------------------
 
--- Exported bindings
-
 -- | Get the notif history DB. Should be done once per runtime.
 getNotifHistoryDb :: IO (AcidState NotifHistoryDb)
 getNotifHistoryDb = openLocalState (NotifHistoryDb [] [] [] [])

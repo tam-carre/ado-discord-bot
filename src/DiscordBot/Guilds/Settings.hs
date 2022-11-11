@@ -39,8 +39,6 @@ import qualified Data.Map.Lazy as Map
 
 ------------------------------------------------------------------------------
 
--- Exported bindings
-
 -- | Get the settings DB. Should be done once per runtime.
 getSettingsDb :: IO (AcidState SettingsDb)
 getSettingsDb = openLocalState (SettingsDb Map.empty)

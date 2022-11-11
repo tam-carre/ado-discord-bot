@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-missing-export-lists #-}
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE OverloadedStrings  #-}
 {-# LANGUAGE TemplateHaskell    #-}
@@ -25,10 +26,12 @@ data GuildSettings = GuildSettings
   , _modRole           :: Maybe Word64
   , _relayCh           :: Maybe Word64
   }
-$(deriveSafeCopy 0 'base ''GuildSettings)
+
+deriveSafeCopy 0 'base ''GuildSettings
 
 newtype SettingsDb = SettingsDb (Map Word64 GuildSettings)
-$(deriveSafeCopy 0 'base ''SettingsDb)
+
+deriveSafeCopy 0 'base ''SettingsDb
 
 findOne :: Word64 -> Query SettingsDb GuildSettings
 findOne guildId = byGuildId guildId <$> ask
