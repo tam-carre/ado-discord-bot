@@ -58,7 +58,7 @@ instance FromJSON SecretBaseVid where
   parseJSON = withObject "single live object" $ \obj -> do
     url <- (frameBaseUrl <>) <$> obj .: "content_code"
     dateStr <- obj .: "released_at"
-    date <- parseTimeM @Parser @UTCTime True defaultTimeLocale "%Y-%-m%-d %T" dateStr
+    date <- parseTimeM @Parser @UTCTime True defaultTimeLocale "%Y-%-m-%-d %T" dateStr
     SecretBaseVid <$> obj .: "thumbnail_url"
                   <*> pure ("Watch at <" <> url <> ">")
                   <*> obj .: "title"

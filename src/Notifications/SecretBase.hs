@@ -64,7 +64,7 @@ latestSecretBaseVid = fetchJson @Vids endpoint >>>= \(Vids vids) -> do
   let notNotified = filter ((`notElem` (notifHistory^.sbVid)) . view url) vids
   let new = filter isNew notNotified
   case listToMaybe new of
-    Nothing -> err "New recent vid found but already notified"
+    Nothing -> err "Recent videos not fresh or already notified"
     Just video -> do
       changeNotifHistory . over sbVid $ \hist -> (video^.url) : take 50 hist
       pure $ Right video
