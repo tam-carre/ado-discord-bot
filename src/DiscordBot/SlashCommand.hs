@@ -146,7 +146,9 @@ notificationChCmd' ::
 notificationChCmd' name' thingToNotify chanL rolePurposeAndL =
   slash $ SlashProps
     { _name    = name'
-    , _desc    = "Sets/clears the chan+role in which to send " <> thingToNotify <> " notifs"
+    , _desc    = "Sets/clears the chan"
+               <> maybe "" (const "+role") rolePurposeAndL
+               <> " in which to send " <> thingToNotify <> " notifs"
     , _permLvl = PermLvlBotManager
     , _options =
       optionCh "channel"
