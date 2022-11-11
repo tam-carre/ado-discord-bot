@@ -1,11 +1,13 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Deepl.Internal (Tl (..)) where
+module Deepl.Internal (Tl (..), translateApi) where
 
 -- Downloaded libraries
-import Data.Aeson      (FromJSON (..), (.:), withObject)
-import Data.Aeson.Lens (key, nth)
-import Control.Lens    ((^?))
+import Data.Aeson          (FromJSON (..), (.:), withObject)
+import BotConfig           (botConfig, BotConfig (..))
+import Data.Aeson.Lens     (key, nth)
+import Control.Lens        ((^?))
+import Network.HTTP.Simple (setRequestHeader, setRequestBodyURLEncoded, Request)
 
 -------------------------------------------------------------------------------
 
@@ -18,3 +20,12 @@ instance FromJSON Tl where
       (\obj -> Tl <$> obj .: "detected_source_language"
                   <*> obj .: "text"
       )
+
+translateApi :: Text -> Request
+translateApi txt = "POST https://api-free.deepl.com/v2/translate"
+  & setRequestHeader
+      "Authorization" [ "DeepL-Auth-Key " <> encodeUtf8 (_deeplKey botConfig) ]
+  & setRequestBodyURLEncoded
+      [ ("target_lang", "EN")
+      , ("text", encodeUtf8 txt)
+      ]

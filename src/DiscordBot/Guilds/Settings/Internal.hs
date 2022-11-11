@@ -53,4 +53,4 @@ unSettingsDb (SettingsDb theMap) = theMap
 setByGuildId :: Word64 -> GuildSettings -> SettingsDb -> SettingsDb
 setByGuildId guildId new (SettingsDb allS) = SettingsDb $ Map.insert guildId new allS
 
-$(makeAcidic ''SettingsDb ['findOne, 'upsert, 'findAll])
+makeAcidic ''SettingsDb ['findOne, 'upsert, 'findAll]
