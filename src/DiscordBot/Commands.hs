@@ -35,7 +35,7 @@ secretBaseCmd :: SlashCommand
 secretBaseCmd = notificationChCmd "secretbase"
   "Ado's Secret Base stream"
   secretBaseCh
-  "will receive notifications for Ado's Secret Base streams"
+  "will receive notifications for Ado's Secret Base streams/vids"
   secretBaseRole
 
 relayCmd :: SlashCommand
