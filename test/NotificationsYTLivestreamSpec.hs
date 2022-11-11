@@ -4,7 +4,7 @@
 module NotificationsYTLivestreamSpec (spec) where
 
 -- Ado Bot modules
-import Notifications.YTLivestream.Internal (VideoIdExtraction (..))
+import Notifications.YTLivestream.Internal (VideoIdExtraction (..), getYtChannelPayload)
 
 -- Downloaded libraries
 import Test.Hspec (Spec, shouldBe, it)
@@ -13,7 +13,11 @@ import Data.Aeson (eitherDecode)
 -------------------------------------------------------------------------------
 
 spec :: Spec
-spec =
+spec = do
+  it "Should get a 200 status code from the channel page" $ do
+    (statusCode, _) <- getYtChannelPayload
+    statusCode `shouldBe` 200
+
   it "Should succeed parsing a valid payload" $ do
     let
       expectedResult = Right (VideoId "dummy")

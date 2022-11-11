@@ -1,11 +1,26 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module Notifications.YTCommunityPosts.Internal (CommunityPost (..)) where
+module Notifications.YTCommunityPosts.Internal
+  ( CommunityPost (..)
+  , getCommunityPostPayload
+  ) where
+
+-- Ado Bot modules
+import Utils (betweenSubstrs)
 
 -- Downloaded libraries
-import Control.Lens ((^.), (^..), (^?))
-import Data.Aeson (FromJSON (..))
+import Control.Lens    ((^.), (^..), (^?))
+import Data.Aeson      (FromJSON (..))
 import Data.Aeson.Lens (key, values, _String, nth)
+import Network.HTTP.Simple
+  ( parseRequest
+  , getResponseStatusCode
+  , getResponseBody
+  , httpBS
+  , setRequestHeader
+  )
+import qualified Data.Text.Lazy.Encoding    as Lazy.Encoding
+import qualified Data.ByteString.Lazy.Char8 as L8
 
 -------------------------------------------------------------------------------
 
@@ -46,3 +61,19 @@ instance FromJSON CommunityPost where
       , _content = foldr ((<>) . (\el -> el^.key "text"._String)) "" $
                      p^..key "contentText".key "runs".values
       }
+
+getCommunityPostPayload :: MonadIO m => m (Int, Maybe L8.ByteString)
+getCommunityPostPayload = do
+  request <- liftIO $ get' "https://www.youtube.com/c/Ado1024/community"
+  response <- httpBS . eng $ request
+
+  let status  = getResponseStatusCode response
+      jsonStr = getPayload . decodeUtf8 $ getResponseBody response
+
+  pure (status, jsonStr)
+  where
+  eng  = setRequestHeader "Accept-Language" ["en"]
+  get' = parseRequest . ("GET " <>)
+  -- | Takes the page source, returns only the embedded JSON
+  getPayload = fmap (Lazy.Encoding.encodeUtf8 . fromStrict)
+    . betweenSubstrs "var ytInitialData = " ";</script>"

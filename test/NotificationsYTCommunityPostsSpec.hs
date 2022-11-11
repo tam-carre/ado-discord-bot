@@ -4,7 +4,7 @@
 module NotificationsYTCommunityPostsSpec (spec) where
 
 -- Ado Bot modules
-import Notifications.YTCommunityPosts.Internal (CommunityPost (..))
+import Notifications.YTCommunityPosts.Internal (CommunityPost (..), getCommunityPostPayload)
 
 -- Downloaded libraries
 import Test.Hspec (Spec, shouldBe, it)
@@ -13,7 +13,12 @@ import Data.Aeson (eitherDecode)
 -------------------------------------------------------------------------------
 
 spec :: Spec
-spec =
+spec = do
+  it "Should successfully GET and parse community posts" $ do
+    (statusCode, Just json) <- getCommunityPostPayload
+    statusCode `shouldBe` 200
+    isRight (eitherDecode @CommunityPost json) `shouldBe` True
+
   it "Should succeed parsing a valid payload" $ do
     let
       expectedResult =
