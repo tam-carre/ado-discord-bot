@@ -1,7 +1,5 @@
 const { Masterchat } = require('masterchat')
 
-const msg = (content, authorName, authorChannelId) => ({ content, authorName, authorChannelId })
-
 const main = async () => {
   const firstArg = process.argv[2]
 

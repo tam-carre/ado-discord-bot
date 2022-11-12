@@ -1,21 +1,17 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TypeApplications  #-}
+{-# LANGUAGE TypeApplications #-}
 
 module NotificationsYTCommunityPostsSpec (spec) where
 
--- Ado Bot modules
-import Notifications.YTCommunityPosts.Internal (CommunityPost (..), getCommunityPostPayload)
+import App.Notifications.YTCommunityPosts.Internal (CommunityPost (..), getCommunityPostPayload)
+import Data.Aeson                                  (eitherDecode)
+import Test.Hspec                                  (Spec, it, shouldBe)
 
--- Downloaded libraries
-import Test.Hspec (Spec, shouldBe, it)
-import Data.Aeson (eitherDecode)
+----------------------------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
-
-spec :: Spec
+spec ∷ Spec
 spec = do
   it "Should successfully GET and parse community posts" $ do
-    (statusCode, Just json) <- getCommunityPostPayload
+    (statusCode, Just json) ← getCommunityPostPayload
     statusCode `shouldBe` 200
     isRight (eitherDecode @CommunityPost json) `shouldBe` True
 
@@ -23,10 +19,10 @@ spec = do
     let
       expectedResult =
         Right $ CommunityPost
-          { _author = "dummy"
-          , _avatar = "https:dummy"
-          , _id = "dummy"
-          , _date = "dummy"
+          { _author  = "dummy"
+          , _avatar  = "https:dummy"
+          , _id      = "dummy"
+          , _date    = "dummy"
           , _content = "dummydummydummydummydummydummydummy"
           }
 

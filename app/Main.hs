@@ -1,31 +1,27 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Main (main) where
 
--- Ado Bot modules
-import Lenses
-import App                                        (Env (Env))
-import BotConfig                                  (botConfig)
-import DiscordBot.Events                          (onDiscordEvent)
-import DiscordBot.Events.BotStartedStartNotifiers (onBotStartedStartNotifiers)
-import DiscordBot.Guilds.Settings                 (getSettingsDb)
-import Notifications.History                      (getNotifHistoryDb)
+import App                                       (Env (Env))
+import App.BotConfig                             (botConfig)
+import App.Discord.Events                        (onDiscordEvent)
+import App.Discord.Events.BotStartedRunNotifiers (onBotStartedRunNotifiers)
+import App.Discord.Guilds.Settings               (getSettingsDb)
+import App.Lenses                                (botToken, gatewayIntent, messageContent, onEvent,
+                                                  onStart, token, (.~), (^.))
+import App.Notifications.History                 (getNotifHistoryDb)
+import Discord                                   (def, runDiscord)
 
--- Downloaded libraries
-import Discord (runDiscord, def)
+----------------------------------------------------------------------------------------------------
 
-------------------------------------------------------------------------------
-
-main :: IO ()
+main ∷ IO ()
 main = do
   echo "Bot started."
 
-  withEnv <- usingReaderT <$> (Env <$> getNotifHistoryDb <*> getSettingsDb)
+  withEnv ← usingReaderT <$> (Env <$> getNotifHistoryDb <*> getSettingsDb)
 
-  botTerminationError <-
+  botTerminationError ←
     runDiscord $ def & token   .~ botConfig^.botToken
                      & onEvent .~ withEnv . onDiscordEvent
-                     & onStart .~ withEnv onBotStartedStartNotifiers
+                     & onStart .~ withEnv onBotStartedRunNotifiers
                      & gatewayIntent .~ (def & messageContent .~ False)
 
-  echo $ "A fatal error occurred: " <> botTerminationError
+  echo $ "A fatal error occurred: " ⊕ botTerminationError

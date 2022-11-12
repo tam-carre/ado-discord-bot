@@ -1,33 +1,23 @@
-{-# LANGUAGE TypeApplications      #-}
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE DuplicateRecordFields #-}
+{-# LANGUAGE DuplicateRecordFields, TypeApplications #-}
 
 module NotificationsSecretBaseSpec (spec) where
 
--- Ado Bot modules
-import Network (fetchJson)
-import Notifications.SecretBase.Internal
-  ( Lives (..)
-  , SecretBaseLive (..)
-  , Vids (..)
-  , secretBaseVidsApi
-  , secretBaseStreamsApi
-  )
+import App.Network                           (fetchJson)
+import App.Notifications.SecretBase.Internal (Lives (..), SecretBaseLive (..), Vids (..),
+                                              secretBaseStreamsApi, secretBaseVidsApi)
+import Data.Aeson                            (eitherDecode)
+import Test.Hspec                            (Spec, it, shouldBe)
 
--- Downloaded libraries
-import Test.Hspec (Spec, shouldBe, it)
-import Data.Aeson (eitherDecode)
+----------------------------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
-
-spec :: Spec
+spec ∷ Spec
 spec = do
   it "Should succeed making a HTTP req to the videolist endpoint and parsing the response" $ do
-    requestAndParsingResult <- fetchJson @Vids secretBaseVidsApi
+    requestAndParsingResult ← fetchJson @Vids secretBaseVidsApi
     isRight requestAndParsingResult `shouldBe` True
 
   it "Should succeed making a HTTP req to the streamlist endpoint and parsing the response" $ do
-    requestAndParsingResult <- fetchJson @Lives secretBaseStreamsApi
+    requestAndParsingResult ← fetchJson @Lives secretBaseStreamsApi
     isRight requestAndParsingResult `shouldBe` True
 
   it "Should succeed parsing a valid payload for livestreams" $ do

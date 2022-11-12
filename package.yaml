@@ -37,6 +37,13 @@ dependencies:
 - mtl
 - template-haskell
 - time
+- data-default
+- base-unicode-symbols
+
+default-extensions:
+- ImportQualifiedPost
+- OverloadedStrings
+- UnicodeSyntax
 
 ghc-options:
 - -Wall

@@ -25,50 +25,57 @@ source-repository head
 library
   exposed-modules:
       App
-      BotConfig
-      Deepl
-      Deepl.Internal
-      DiscordBot.Commands
-      DiscordBot.Events
-      DiscordBot.Events.BotStartedStartNotifiers
-      DiscordBot.Events.DiscordAPI.InteractionCreate
-      DiscordBot.Events.DiscordAPI.Ready
-      DiscordBot.Events.NewYTChatMsg
-      DiscordBot.Events.NewYTChatMsg.Internal
-      DiscordBot.Events.Notify
-      DiscordBot.Events.Notify.Types
-      DiscordBot.Guilds.Settings
-      DiscordBot.Guilds.Settings.Internal
-      DiscordBot.Perms
-      DiscordBot.Perms.Types
-      DiscordBot.SendMessage
-      DiscordBot.SlashCommand
-      DiscordBot.SlashCommand.Types
-      Lenses
-      Network
-      Notifications.History
-      Notifications.History.Internal
-      Notifications.SecretBase
-      Notifications.SecretBase.Internal
-      Notifications.Utils
-      Notifications.YTCommunityPosts
-      Notifications.YTCommunityPosts.Internal
-      Notifications.YTLivestream
-      Notifications.YTLivestream.Internal
+      App.BotConfig
+      App.Deepl
+      App.Deepl.Internal
+      App.Discord.Commands
+      App.Discord.Events
+      App.Discord.Events.BotStartedRunNotifiers
+      App.Discord.Events.Gateway.InteractionCreate
+      App.Discord.Events.Gateway.Ready
+      App.Discord.Events.NewYTChatMsg
+      App.Discord.Events.NewYTChatMsg.Internal
+      App.Discord.Events.Notify
+      App.Discord.Events.Notify.Types
+      App.Discord.Guilds.Settings
+      App.Discord.Guilds.Settings.Internal
+      App.Discord.Internal
+      App.Discord.Perms
+      App.Discord.Perms.Types
+      App.Discord.SendMessage
+      App.Discord.SlashCommand
+      App.Discord.SlashCommand.Types
+      App.Lenses
+      App.Network
+      App.Notifications.History
+      App.Notifications.History.Internal
+      App.Notifications.Internal
+      App.Notifications.SecretBase
+      App.Notifications.SecretBase.Internal
+      App.Notifications.YTCommunityPosts
+      App.Notifications.YTCommunityPosts.Internal
+      App.Notifications.YTLivestream
+      App.Notifications.YTLivestream.Internal
+      App.Utils
       Prelude
       Tokens
-      Utils
   other-modules:
       Paths_ado_discord_bot
   hs-source-dirs:
       src
+  default-extensions:
+      ImportQualifiedPost
+      OverloadedStrings
+      UnicodeSyntax
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       acid-state
     , aeson
     , base-noprelude
+    , base-unicode-symbols
     , bytestring
     , containers
+    , data-default
     , discord-haskell
     , emoji
     , hspec
@@ -97,14 +104,20 @@ executable ado-discord-bot-exe
       Paths_ado_discord_bot
   hs-source-dirs:
       app
+  default-extensions:
+      ImportQualifiedPost
+      OverloadedStrings
+      UnicodeSyntax
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       acid-state
     , ado-discord-bot
     , aeson
     , base-noprelude
+    , base-unicode-symbols
     , bytestring
     , containers
+    , data-default
     , discord-haskell
     , emoji
     , hspec
@@ -138,14 +151,20 @@ test-suite ado-discord-bot-test
       Paths_ado_discord_bot
   hs-source-dirs:
       test
+  default-extensions:
+      ImportQualifiedPost
+      OverloadedStrings
+      UnicodeSyntax
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       acid-state
     , ado-discord-bot
     , aeson
     , base-noprelude
+    , base-unicode-symbols
     , bytestring
     , containers
+    , data-default
     , discord-haskell
     , emoji
     , hspec

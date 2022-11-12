@@ -1,39 +1,30 @@
-{-# LANGUAGE TypeApplications  #-}
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TypeApplications #-}
 
 module NotificationsYTLivestreamSpec (spec) where
 
--- Ado Bot modules
-import Notifications.YTLivestream.Internal     (VideoIdExtraction (..), getYtChannelPayload)
-import DiscordBot.Events.NewYTChatMsg.Internal (Msg)
+import App.Discord.Events.NewYTChatMsg.Internal (Msg)
+import App.Notifications.YTLivestream.Internal  (VideoIdExtraction (..), getYtChannelPayload)
+import Data.Aeson                               (eitherDecode)
+import Data.ByteString.Lazy                     (hGetContents)
+import System.Exit                              (ExitCode (ExitSuccess))
+import System.Process                           (CreateProcess (..), StdStream (..), createProcess,
+                                                 shell, waitForProcess)
+import Test.Hspec                               (Spec, it, shouldBe)
 
--- Downloaded libraries
-import Test.Hspec     (Spec, shouldBe, it)
-import Data.Aeson     (eitherDecode)
-import System.Process
-  ( shell
-  , createProcess
-  , StdStream (..)
-  , CreateProcess (..)
-  , waitForProcess
-  )
-import System.Exit (ExitCode (ExitSuccess))
-import Data.ByteString.Lazy (hGetContents)
+----------------------------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
-
-spec :: Spec
+spec ∷ Spec
 spec = do
   it "Should successfully run masterchat and parse a livechat msg" $ do
-    (_, Just ho1, _, hp1) <- createProcess (shell "node ./masterchat/index.js TEST")
+    (_, Just ho1, _, hp1) ← createProcess (shell "node ./masterchat/index.js TEST")
                               { std_out = CreatePipe }
-    output <- hGetContents ho1
-    exitCode <- waitForProcess hp1
+    output ← hGetContents ho1
+    exitCode ← waitForProcess hp1
     exitCode `shouldBe` ExitSuccess
     isRight (eitherDecode @Msg output) `shouldBe` True
 
   it "Should get a 200 status code from the channel page" $ do
-    (statusCode, _) <- getYtChannelPayload
+    (statusCode, _) ← getYtChannelPayload
     statusCode `shouldBe` 200
 
   it "Should succeed parsing a valid payload" $ do

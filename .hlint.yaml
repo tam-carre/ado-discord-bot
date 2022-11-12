@@ -1,4 +1,5 @@
 - arguments:
+
   - "-XConstraintKinds"
   - "-XDeriveGeneric"
   - "-XGeneralizedNewtypeDeriving"
@@ -3286,3 +3287,44 @@
     lhs: "(,) a <$> f a"
     note: "Use `traverseToSnd` from `Relude.Extra.Tuple`"
     rhs: traverseToSnd f a
+- warn:
+    lhs: "DiscordId . Snowflake"
+    rhs: DiscordBot.Guilds.Settings.w64DId
+- warn:
+    lhs: "if p x then a x else pass"
+    rhs: Utils.when' p a x
+- warn:
+    lhs: "if x then y else pass"
+    rhs: when x y
+- warn:
+    lhs: "changeNotifHistory"
+    rhs: addToHistory
+- warn:
+    lhs: "putTextLn"
+    note: "Use `echo` from Prelude"
+    rhs: echo
+- warn:
+    lhs: "putStrLn"
+    note: "Use `echo` from Prelude"
+    rhs: echo
+- warn:
+    lhs: "m <&> (>>= f)"
+    rhs: m <&>>= f
+- warn:
+    lhs: "\\t -> l <> t <> r"
+    rhs: decorate l r
+- warn:
+    lhs: "void . UnliftIO.Concurrent.forkIO"
+    rhs: Utils.forkIO_
+- warn:
+    lhs: "void . Discord.restCall"
+    rhs: DiscordBot.Internal.restCall_
+- warn:
+    lhs: "not . any f"
+    rhs: Lenses.none f
+- warn:
+    lhs: ">> pure x"
+    rhs: $> x
+- warn:
+    lhs: "≫  pure x"
+    rhs: $> x
