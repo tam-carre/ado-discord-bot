@@ -27,7 +27,7 @@ data CommunityPost
 instance FromJSON CommunityPost where
   parseJSON ytData = do
     let tabs = ytData^..key "contents".key "twoColumnBrowseResultsRenderer".key "tabs".values
-        isCommunity t = t^.key "tabRenderer".key "title"._String == "Community"
+        isCommunity t = t^.key "tabRenderer".key "title"._String ≡ "Community"
 
     communityTab ← case find isCommunity tabs of
       Nothing → fail $ "Coult not find community tab in " ⊕ show tabs
@@ -50,7 +50,7 @@ instance FromJSON CommunityPost where
       , _avatar  = "https:" ⊕ p^.key "authorThumbnail".key "thumbnails".nth 2.key "url"._String
       , _id      = p^.key "postId"._String
       , _date    = p^.key "publishedTimeText".key "runs".nth 0.key "text"._String
-      , _content = foldr ((<>) . (\el → el^.key "text"._String)) "" $
+      , _content = foldr ((⊕) . (^.key "text"._String)) "" $
                      p^..key "contentText".key "runs".values
       }
 

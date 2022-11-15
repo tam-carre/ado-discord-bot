@@ -44,6 +44,7 @@ default-extensions:
 - ImportQualifiedPost
 - OverloadedStrings
 - UnicodeSyntax
+- NoFieldSelectors
 
 ghc-options:
 - -Wall
@@ -67,6 +68,8 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -fwrite-ide-info
+    - -hiedir=.hie
     dependencies:
     - ado-discord-bot
 

@@ -3301,30 +3301,49 @@
     rhs: addToHistory
 - warn:
     lhs: "putTextLn"
-    note: "Use `echo` from Prelude"
     rhs: echo
 - warn:
     lhs: "putStrLn"
-    note: "Use `echo` from Prelude"
     rhs: echo
 - warn:
     lhs: "m <&> (>>= f)"
-    rhs: m <&>>= f
+    rhs: "m <&>>= f"
 - warn:
     lhs: "\\t -> l <> t <> r"
-    rhs: decorate l r
+    rhs: "decorate l r"
 - warn:
     lhs: "void . UnliftIO.Concurrent.forkIO"
-    rhs: Utils.forkIO_
+    rhs: "Utils.forkIO_"
 - warn:
     lhs: "void . Discord.restCall"
-    rhs: DiscordBot.Internal.restCall_
+    rhs: "DiscordBot.Internal.restCall_"
 - warn:
     lhs: "not . any f"
-    rhs: Lenses.none f
+    rhs: "Lenses.none f"
 - warn:
-    lhs: ">> pure x"
-    rhs: $> x
+    lhs: "y  >> pure x"
+    rhs: "y $> x"
 - warn:
-    lhs: "≫  pure x"
-    rhs: $> x
+    lhs: "y ≫  pure x"
+    rhs: "y $> x"
+- warn:
+    lhs: "left toText . eitherDecode"
+    rhs: "App.Utils.decodeE"
+- warn:
+    lhs: "left toText $ eitherDecode"
+    rhs: "App.Utils.decodeE"
+- warn:
+    lhs: "if c then pass else fail e"
+    rhs: "App.Utils.posit c e"
+- warn:
+    lhs: "if c then pure () else fail e"
+    rhs: "App.Utils.posit c e"
+- warn:
+    lhs: "posit c \"\""
+    rhs: "App.Utils.posit' c"
+- warn:
+    lhs: "posit c ()"
+    rhs: "App.Utils.posit' c"
+- warn:
+    lhs: "maybeToRight"
+    rhs: "onFail"

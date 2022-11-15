@@ -67,6 +67,7 @@ library
       ImportQualifiedPost
       OverloadedStrings
       UnicodeSyntax
+      NoFieldSelectors
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
   build-depends:
       acid-state
@@ -108,7 +109,8 @@ executable ado-discord-bot-exe
       ImportQualifiedPost
       OverloadedStrings
       UnicodeSyntax
-  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+      NoFieldSelectors
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N -fwrite-ide-info -hiedir=.hie
   build-depends:
       acid-state
     , ado-discord-bot
@@ -155,6 +157,7 @@ test-suite ado-discord-bot-test
       ImportQualifiedPost
       OverloadedStrings
       UnicodeSyntax
+      NoFieldSelectors
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       acid-state

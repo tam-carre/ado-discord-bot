@@ -1,112 +1,76 @@
 {-# OPTIONS -Wno-missing-fields #-}
-{-# LANGUAGE DuplicateRecordFields, ImpredicativeTypes, LambdaCase, ViewPatterns #-}
+{-# LANGUAGE DuplicateRecordFields, FlexibleContexts, FlexibleInstances, ImpredicativeTypes #-}
 
 module App.Discord.SlashCommand
   ( SlashCommand (..)
-  , SlashProps (..)
-  , getChOpt
-  , getRoleOpt
-  , getStrOpt
   , notificationChCmd
   , notificationChCmdNoRole
   , optionCh
   , optionRole
   , optionString
-  , required
-  , requiredOpt
   , roleCmd
-  , slash
   ) where
 
 import App                            (App)
 import App.Discord.Guilds.Settings    (GuildSettings, changeSettings, w64)
 import App.Discord.Perms              (PermLvl (..))
 import App.Discord.SendMessage        (replyEmbed)
-import App.Discord.SlashCommand.Types (SlashCommand (..), SlashProps (..))
-import App.Lenses                     (Lens', channelTypes, desc, description, handler,
-                                       localizedDescription, localizedName, name, options, permLvl,
-                                       registration, set, stringChoices, stringMaxLen, stringMinLen,
-                                       (.~), (?~), (^.))
-import App.Lenses                     qualified as L
-import Discord.Interactions           (ApplicationCommandChannelType (ApplicationCommandChannelTypeGuildText),
-                                       CreateApplicationCommand (..), OptionDataValue (..),
-                                       OptionValue (..), Options (OptionsValues),
-                                       OptionsData (OptionsDataValues), createChatInput)
+import App.Discord.SlashCommand.Types (SlashCommand (..))
+import App.Lenses                     (Lens', Prism', _2, _Just, _OptionDataValueChannel,
+                                       _OptionDataValueRole, _OptionsDataValues, channelTypes, desc,
+                                       description, handler, localizedDescription, localizedName,
+                                       name, options, permLvl, reg, required, set, stringChoices,
+                                       stringMaxLen, stringMinLen, to, (.~), (?~), (^.), (≫^?))
+import Discord.Interactions           (ApplicationCommandChannelType (..), CreateApplicationCommand,
+                                       OptionDataValue (..), OptionValue (..),
+                                       Options (OptionsValues), OptionsData, createChatInput)
 import Discord.Types                  (ChannelId, RoleId)
 
 ----------------------------------------------------------------------------------------------------
 
-slash ∷ SlashProps → SlashCommand
-slash props = SlashCommand {}
-  & name    .~ props^.name
-  & desc    .~ props^.desc
-  & permLvl .~ props^.permLvl
-  & options .~ props^.options
-  & handler .~ props^.handler
-  & registration .~ ( createChatInput (props^.name) (props^.desc) ≫= \case
-                        slashCmd@CreateApplicationCommandChatInput {} →
-                          Just $ slashCmd & options ?~ OptionsValues (props^.options)
-                        _ → Nothing
-                    )
+chatInput ∷ Text → Text → [OptionValue] → Maybe CreateApplicationCommand
+chatInput name' desc' options' =
+  createChatInput name' desc' & _Just.options ?~ OptionsValues options'
 
 optDef ∷ Text → Text → OptionValue → OptionValue
-optDef name' desc' = name          .~ name'
-                   ⋙ description   .~ desc'
-                   ⋙ localizedName .~ Nothing
-                   ⋙ L.required    .~ False
-                   ⋙ localizedDescription .~ Nothing
+optDef name' desc'
+  = name          .~ name'
+  ⋙ description   .~ desc'
+  ⋙ localizedName .~ Nothing
+  ⋙ required      .~ False
+  ⋙ localizedDescription .~ Nothing
+
+req ∷ OptionValue → OptionValue
+req = set required True
 
 optionString ∷ Text → Text → OptionValue
 optionString name' description' =
-  OptionValueString {}
-    & optDef name' description'
-    & L.required    .~ True
+  OptionValueString {} & optDef name' description'
     & stringChoices .~ Left False
     & stringMinLen  .~ Nothing
     & stringMaxLen  .~ Nothing
+    & req
 
 optionCh ∷ Text → Text → OptionValue
 optionCh name' description' =
-  OptionValueChannel {}
-    & optDef name' description'
+  OptionValueChannel {} & optDef name' description'
     & channelTypes ?~ [ApplicationCommandChannelTypeGuildText]
 
 optionRole ∷ Text → Text → OptionValue
 optionRole name' description' = OptionValueRole {} & optDef name' description'
 
-requiredOpt ∷ (Text → Text → OptionValue) → Text → Text → OptionValue
-requiredOpt builder name' description' = builder name' description' & L.required .~ True
-
-required ∷ (Text → Maybe OptionsData → App (Maybe a)) → Text → Maybe OptionsData → App a
-required getter name' opts = getter name' opts
-  <&> fromMaybe (error "Asked for required option but it wasn't registered as such.")
-
-getStrOpt ∷ Text → Maybe OptionsData → App (Maybe Text)
-getStrOpt = getOpt toStr where
-  toStr (OptionDataValueString _ (Right str)) = Just str
-  toStr _                                     = Nothing
+getOpt ∷ Prism' OptionDataValue (a, b) → Text → Maybe OptionsData → App (Maybe b)
+getOpt kind name' optData =
+  pure $ optData≫^?_OptionsDataValues.to (find ((name'≡) . (^.name)))._Just.kind._2
 
 getChOpt ∷ Text → Maybe OptionsData → App (Maybe ChannelId)
-getChOpt = getOpt toCh where
-  toCh (OptionDataValueChannel _ cId) = Just cId
-  toCh _                              = Nothing
+getChOpt = getOpt _OptionDataValueChannel
 
 getRoleOpt ∷ Text → Maybe OptionsData → App (Maybe RoleId)
-getRoleOpt = getOpt toRole where
-  toRole (OptionDataValueRole _ rId) = Just rId
-  toRole _                           = Nothing
+getRoleOpt = getOpt _OptionDataValueRole
 
-getOpt ∷ (OptionDataValue → Maybe a) → Text → Maybe OptionsData → App (Maybe a)
-getOpt toA name' (opt name' toA → a) = pure a
-
-opt ∷ Text → (OptionDataValue → Maybe a) → Maybe OptionsData → Maybe a
-opt n toA = \case
-  Just (OptionsDataValues (findOpt n → Just (toA → a))) → a
-  _                                                     → Nothing
-  where findOpt optName = find ((optName ≡) . (^.name))
-
-notificationChCmd ∷
-  Text
+notificationChCmd
+  ∷ Text
   → Text
   → Lens' GuildSettings (Maybe Word64)
   → Text
@@ -119,22 +83,27 @@ notificationChCmdNoRole ∷ Text → Text → Lens' GuildSettings (Maybe Word64)
 notificationChCmdNoRole name' thingToNotify chanL =
   notificationChCmd' name' thingToNotify chanL Nothing
 
-notificationChCmd' ∷
-  Text
+notificationChCmd'
+  ∷ Text
   → Text
   → Lens' GuildSettings (Maybe Word64)
   → Maybe (Text, Lens' GuildSettings (Maybe Word64))
   → SlashCommand
 notificationChCmd' name' thingToNotify chanL rolePurposeAndL =
-  slash $ SlashProps {}
+  let desc' = "Sets/clears the chan"
+            ⊕ maybe "" (const "+role") rolePurposeAndL
+            ⊕ " in which to send " ⊕ thingToNotify ⊕ " notifs"
+  in SlashCommand {}
     & name    .~ name'
-    & desc    .~ "Sets/clears the chan"
-              ⊕ maybe "" (const "+role") rolePurposeAndL
-              ⊕ " in which to send " ⊕ thingToNotify ⊕ " notifs"
+    & desc    .~ desc'
     & permLvl .~ PermLvlBotManager
-    & options .~ optionCh "channel"
-                  ("The channel (if any) in which to send " ⊕ thingToNotify ⊕ " notifications")
-               : maybe [] (\(p,_) → [optionRole "role" $ "The role which " ⊕ p]) rolePurposeAndL
+    & reg     .~ chatInput name' desc'
+                   (catMaybes
+                     [ Just $ optionCh "channel"
+                       ("The channel (if any) in which to send " ⊕ thingToNotify ⊕ " notifications")
+                     , optionRole "role" . ("The role which " ⊕). fst <$> rolePurposeAndL
+                     ]
+                   )
     & handler .~
       \intr _mem gid' opts → do
         chanId ← getChOpt "channel" opts
@@ -161,11 +130,12 @@ notificationChCmd' name' thingToNotify chanL rolePurposeAndL =
 
 roleCmd ∷ Text → Text → Lens' GuildSettings (Maybe Word64) → SlashCommand
 roleCmd name' purpose roleL =
-  slash $ SlashProps {}
+  let desc' = "Sets the role which " ⊕ purpose
+   in SlashCommand {}
     & name    .~ name'
-    & desc    .~ "Sets the role which " ⊕ purpose
+    & desc    .~ desc'
     & permLvl .~ PermLvlBotManager
-    & options .~ [requiredOpt optionRole "role" $ "The role which " ⊕ purpose]
+    & reg     .~ chatInput name' desc' [req . optionRole "role" $ "The role which " ⊕ purpose]
     & handler .~
       \intr _mem gid' opts → do
         roleId ← getRoleOpt "role" opts

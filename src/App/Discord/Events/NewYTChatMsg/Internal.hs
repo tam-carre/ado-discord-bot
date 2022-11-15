@@ -29,7 +29,7 @@ isAdo msg = msg^.chId ≡ "UCln9P4Qm3-EAY4aiEPmRwEA"
 
 adoMsg ∷ Msg → Maybe Text → Text
 adoMsg msg tl =
-  "<:AdoHappy:885833189086593024> **" ⊕ msg^.name ⊕ "**: " ⊕ msg^.content
+  "<:AdoHappy:885833189086593024> **" ⊕ (msg^.name) ⊕ "**: " ⊕ msg^.content
    ⊕ maybe "" (decorate "\n*[DeepL] " "*") tl
 
 tlMsg ∷ Text → Text → Text

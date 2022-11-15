@@ -1,3 +1,5 @@
+{-# LANGUAGE FieldSelectors #-}
+
 module App.BotConfig (BotConfig (..), botConfig) where
 
 import Tokens qualified

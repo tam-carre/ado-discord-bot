@@ -6,7 +6,7 @@ import App.Discord.Commands        (appCommands)
 import App.Discord.Guilds.Settings (w64DId)
 import App.Discord.Internal        (restCall_)
 import App.Discord.SlashCommand    (SlashCommand (..))
-import App.Lenses                  (id, ownerDebugGuildId, registration, to, (^.), (≫^.))
+import App.Lenses                  (id, ownerDebugGuildId, reg, to, (^.), (≫^.))
 import Discord                     (RestCallErrorCode (..), restCall)
 import Discord.Interactions        (ApplicationCommand (..))
 import Discord.Requests            (ApplicationCommandRequest (..))
@@ -27,10 +27,10 @@ onReady appId = do
       unregisterOutdatedCmds appId cmds
 
 tryRegistering ∷ ApplicationId → SlashCommand → App (Either RestCallErrorCode ApplicationCommand)
-tryRegistering appId cmd = case cmd^.registration of
-  Just reg → lift $ do
-    restCall_ $ CreateGuildApplicationCommand appId debugGuild reg
-    restCall  $ CreateGlobalApplicationCommand appId reg
+tryRegistering appId cmd = case cmd^.reg of
+  Just reg' → lift $ do
+    restCall_ $ CreateGuildApplicationCommand appId debugGuild reg'
+    restCall  $ CreateGlobalApplicationCommand appId reg'
   Nothing → pure . Left $ RestCallErrorCode 0 "" ""
 
 unregisterOutdatedCmds ∷ ApplicationId → [ApplicationCommand] → App ()

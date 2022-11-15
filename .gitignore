@@ -5,3 +5,4 @@ state/
 *~
 Tokens.hs
 dist-newstyle/
+.hie/

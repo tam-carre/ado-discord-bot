@@ -1,4 +1,4 @@
-{-# LANGUAGE DuplicateRecordFields, TypeApplications #-}
+{-# LANGUAGE DuplicateRecordFields, FieldSelectors, TypeApplications #-}
 
 module App.Notifications.SecretBase.Internal
   ( Lives (..)

@@ -2,15 +2,18 @@
 
 module App.Utils where
 
-import Control.Concurrent  (threadDelay)
+import Control.Arrow              (left)
+import Control.Concurrent         (threadDelay)
 import Control.Lens
-import Data.Char           (toLower, toUpper)
-import Data.List           (stripPrefix)
-import Data.Text           (splitOn)
-import Data.Text           qualified as T
+import Data.Aeson                 (FromJSON, eitherDecode)
+import Data.ByteString.Lazy.Char8 qualified as L8
+import Data.Char                  (toLower, toUpper)
+import Data.List                  (stripPrefix)
+import Data.Text                  (splitOn)
+import Data.Text                  qualified as T
 import Language.Haskell.TH
-import UnliftIO            (MonadUnliftIO)
-import UnliftIO.Concurrent (forkIO)
+import UnliftIO                   (MonadUnliftIO)
+import UnliftIO.Concurrent        (forkIO)
 
 ----------------------------------------------------------------------------------------------------
 
@@ -28,7 +31,7 @@ betweenSubstrs substr1 substr2 =
 
 -- | e.g. `decorate "<" ">" "script" ≡ "<script>"
 decorate ∷ Text → Text → Text → Text
-decorate left right input = left ⊕ input ⊕ right
+decorate left'' right input = left'' ⊕ input ⊕ right
 
 -- | takes seconds as argument
 sleep ∷ MonadIO m ⇒ Int → m ()
@@ -75,3 +78,16 @@ applyWhen p f a = if p a then f a else a
 
 trunc ∷ Int → Text → Text
 trunc len = applyWhen (T.length ⋙ (> len)) (T.take (len-1) ⋙ (⊕ "…"))
+
+onFail ∷ l → Maybe r → Either l r
+onFail = maybeToRight
+
+decodeE ∷ FromJSON a ⇒ L8.ByteString → Either Text a
+decodeE = left toText . eitherDecode
+
+{- HLINT ignore posit -}
+posit ∷ MonadFail m ⇒ Bool → Text → m ()
+posit cond e = if cond then pass else fail (toString e)
+
+posit' ∷ MonadFail m ⇒ Bool → m ()
+posit' cond = posit cond ""

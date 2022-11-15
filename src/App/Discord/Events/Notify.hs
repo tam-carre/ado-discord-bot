@@ -9,7 +9,7 @@ import App.Discord.SendMessage         (embed, sendWithEmbed')
 import App.Lenses                      (author, authorIcon, authorName, description, embedContent,
                                         embedUrl, msgTxt, settingsToCh, settingsToRole, thumb,
                                         thumbnail, url, (.~), (^.))
-import App.Utils                       (decorate, trunc)
+import App.Utils                       (decorate)
 import Data.Map                        qualified as Map
 import Discord.Types                   (CreateEmbedImage (..))
 
@@ -21,7 +21,7 @@ notify n = do
   let chAndRole gs = (n^.settingsToCh) gs <&> (, (n^.settingsToRole) gs)
       pendingMsgs  = mapMaybe chAndRole $ Map.elems allSettings
       avvie        = CreateEmbedImageUrl <$> n^.thumb
-      embedTxt     = n^.embedContent & trunc 1999
+      embedTxt     = n^.embedContent
       msgEmbed     = embed & authorName  .~ n^.author
                            & authorIcon  .~ avvie
                            & thumbnail   .~ avvie

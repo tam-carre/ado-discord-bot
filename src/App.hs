@@ -1,3 +1,5 @@
+{-# LANGUAGE FieldSelectors #-}
+
 module App (App, Env (..)) where
 
 import App.Discord.Guilds.Settings.Internal (SettingsDb)
