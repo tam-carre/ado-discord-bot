@@ -3,13 +3,13 @@
 module App.Notifications.YTCommunityPosts (CommunityPost (..), getNextNewCommunityPost) where
 
 import App                                         (App)
-import App.Lenses                                  (community, date, id, none, to, (^.))
+import App.Lenses                                  (community, date, id, to, (^.))
 import App.Notifications.History                   (NotifHistoryDb, getNotifHistory)
 import App.Notifications.Internal                  (addToHistory, returnWhenFound)
-import App.Notifications.YTCommunityPosts.Internal (CommunityPost (..), getCommunityPostPayload)
+import App.Notifications.YTCommunityPosts.Internal (CommunityPost (..), getCommunityPostPayload,
+                                                    isFresh)
 import App.Utils                                   (decodeE, onFail, posit)
 import Data.ByteString.Lazy.Char8                  qualified as L8
-import Data.Text                                   (isInfixOf)
 
 ----------------------------------------------------------------------------------------------------
 
@@ -29,9 +29,6 @@ getPostId (status, payloadMaybe) history = do
   _       ← posit (status ≡ 200) "Non-200 status code"
   payload ← payloadMaybe & onFail "Failed to' extract JSON from HTML"
   post    ← decodeE @CommunityPost payload
-  _       ← posit (post^.date.to isToday) "Post older than an hour"
+  _       ← posit (post^.date.to isFresh) "Post older than an hour"
   _       ← posit ((post^.id) ∉ history^.community) "Post already notified"
   pure post
-
-isToday ∷ Text → Bool
-isToday date' = none (`isInfixOf` date') ["day", "week", "month", "year", "hour"]

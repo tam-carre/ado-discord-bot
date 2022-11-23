@@ -1,13 +1,15 @@
 module App.Notifications.YTCommunityPosts.Internal
   ( CommunityPost (..)
   , getCommunityPostPayload
+  , isFresh
   ) where
 
 import App.Utils                  (betweenSubstrs)
-import Control.Lens               ((^.), (^..), (^?))
+import Control.Lens               (none, (^.), (^..), (^?))
 import Data.Aeson                 (FromJSON (..))
 import Data.Aeson.Lens            (_String, key, nth, values)
 import Data.ByteString.Lazy.Char8 qualified as L8
+import Data.Text                  (isInfixOf)
 import Data.Text.Lazy.Encoding    qualified as Lazy.Encoding
 import Network.HTTP.Simple        (getResponseBody, getResponseStatusCode, httpBS, parseRequest,
                                    setRequestHeader)
@@ -69,3 +71,6 @@ getCommunityPostPayload = do
   -- | Takes the page source, returns only the embedded JSON
   getPayload = fmap (Lazy.Encoding.encodeUtf8 . fromStrict)
     . betweenSubstrs "var ytInitialData = " ";</script>"
+
+isFresh ∷ Text → Bool
+isFresh date' = none (`isInfixOf` date') ["day", "week", "month", "year", "hour"]

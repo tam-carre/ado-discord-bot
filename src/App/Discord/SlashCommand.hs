@@ -3,6 +3,7 @@
 
 module App.Discord.SlashCommand
   ( SlashCommand (..)
+  , chatInput
   , notificationChCmd
   , notificationChCmdNoRole
   , optionCh
@@ -17,7 +18,7 @@ import App.Discord.Perms              (PermLvl (..))
 import App.Discord.SendMessage        (replyEmbed)
 import App.Discord.SlashCommand.Types (SlashCommand (..))
 import App.Lenses                     (Lens', Prism', _2, _Just, _OptionDataValueChannel,
-                                       _OptionDataValueRole, _OptionsDataValues, channelTypes, desc,
+                                       _OptionDataValueRole, _OptionsDataValues, channelTypes,
                                        description, handler, localizedDescription, localizedName,
                                        name, options, permLvl, reg, required, set, stringChoices,
                                        stringMaxLen, stringMinLen, to, (.~), (?~), (^.), (≫^?))
@@ -95,7 +96,6 @@ notificationChCmd' name' thingToNotify chanL rolePurposeAndL =
             ⊕ " in which to send " ⊕ thingToNotify ⊕ " notifs"
   in SlashCommand {}
     & name    .~ name'
-    & desc    .~ desc'
     & permLvl .~ PermLvlBotManager
     & reg     .~ chatInput name' desc'
                    (catMaybes
@@ -133,7 +133,6 @@ roleCmd name' purpose roleL =
   let desc' = "Sets the role which " ⊕ purpose
    in SlashCommand {}
     & name    .~ name'
-    & desc    .~ desc'
     & permLvl .~ PermLvlBotManager
     & reg     .~ chatInput name' desc' [req . optionRole "role" $ "The role which " ⊕ purpose]
     & handler .~

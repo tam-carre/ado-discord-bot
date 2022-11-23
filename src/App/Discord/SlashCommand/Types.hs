@@ -14,7 +14,6 @@ type SlashHandler = Interaction → GuildMember → GuildId → Maybe OptionsDat
 data SlashCommand
   = SlashCommand
     { _name    ∷ Text
-    , _desc    ∷ Text
     , _permLvl ∷ PermLvl
     , _reg     ∷ Maybe CreateApplicationCommand
     , _handler ∷ SlashHandler

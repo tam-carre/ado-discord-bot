@@ -2,7 +2,8 @@
 
 module NotificationsYTCommunityPostsSpec (spec) where
 
-import App.Notifications.YTCommunityPosts.Internal (CommunityPost (..), getCommunityPostPayload)
+import App.Notifications.YTCommunityPosts.Internal (CommunityPost (..), getCommunityPostPayload,
+                                                    isFresh)
 import Data.Aeson                                  (eitherDecode)
 import Test.Hspec                                  (Spec, it, shouldBe)
 
@@ -10,10 +11,21 @@ import Test.Hspec                                  (Spec, it, shouldBe)
 
 spec ∷ Spec
 spec = do
+  it "isFresh should accept recent posts" $ do
+    isFresh "2 minutes ago" `shouldBe` True
+    isFresh "1 minute ago" `shouldBe` True
+    isFresh "15 seconds ago" `shouldBe` True
+    isFresh "1 second ago" `shouldBe` True
+    isFresh "1 hour ago" `shouldBe` False
+    isFresh "2 hours ago" `shouldBe` False
+    isFresh "1 day ago" `shouldBe` False
+    isFresh "2 days ago" `shouldBe` False
+
   it "Should successfully GET and parse community posts" $ do
     (statusCode, Just json) ← getCommunityPostPayload
     statusCode `shouldBe` 200
-    isRight (eitherDecode @CommunityPost json) `shouldBe` True
+    let post = eitherDecode @CommunityPost json
+    isRight post `shouldBe` True
 
   it "Should succeed parsing a valid payload" $ do
     let
